@@ -1,0 +1,28 @@
+{
+    "events": [
+        {
+            "version": "1.0",
+            "eventId": "d848985f-0d4d-4bf2-92e4-970679a64a06",
+            "eventOrigin": "bos:realtime",
+            "eventTime": "1970-01-01T00:00:00.000Z",
+            "eventType": "PutObject",
+            "content": {
+                "userId": "0f1d23bb80274ea5a9d50fe94c150641",
+                "domain": "{{region}}.bos.baidu.com",
+                "bucket": "{{bucket}}",
+                "object": "{{object}}",
+                "etag": "0cd0545962d6f4c915fe2051a835032d",
+                "contentType": "image/png",
+                "filesize": 1024,
+                "lastModified": "1970-01-01T00:00:00.000Z",
+                "credentials": {
+                    "accessKeyId": "EXAMPLE123456789a106475a8796ca04",
+                    "secretAccessKey": "EXAMPLE1234567890de02541d817dac5",
+                    "sessionToken": "EXAMPLE123456789/cm3YyGd5JA/YgArWFo=",
+                    "expiration": "1970-01-01T01:00:00.000Z"
+                },
+                "xVars": ""
+            }
+        }
+    ]
+}

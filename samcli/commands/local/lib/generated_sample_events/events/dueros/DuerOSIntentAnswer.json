@@ -1,0 +1,46 @@
+{
+    "version": "2.0",
+    "session": {
+        "new": false,
+        "sessionId": "{{session_id}}",
+        "attributes": {}
+    },
+    "context": {
+        "System": {
+            "application": {
+                "applicationId": "{{application_id}}"
+            }
+        }
+    },
+    "request": {
+        "type": "IntentRequest",
+        "requestId": "{{request_id}}",
+        "timestamp": "1499169543",
+        "query": {
+            "type": "TEXT",
+            "original": "帮我查一下个税"
+        },
+        "intents": [
+            {
+                "name": "personal_income_tax.inquiry",
+                "confirmationStatus": "NONE",
+                "slots": {
+                    "compute_type": {
+                        "name": "compute_type",
+                        "values": [
+                            "个税"
+                        ],
+                        "confirmationStatus": "NONE"
+                    },
+                    "inquiry": {
+                        "name": "inquiry",
+                        "values": [
+                            "查一下"
+                        ],
+                        "confirmationStatus": "NONE"
+                    }
+                }
+            }
+        ]
+    }
+}

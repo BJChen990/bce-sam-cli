@@ -1,0 +1,21 @@
+{
+    "version": "2.0",
+    "session": {
+        "new": false,
+        "sessionId": "{{session_id}}",
+        "attributes": {}
+    },
+    "context": {
+        "System": {
+            "application": {
+                "applicationId": "{{application_id}}"
+            }
+        }
+    },
+    "request": {
+        "type": "SessionEndedRequest",
+        "requestId": "{{request_id}}",
+        "timestamp": "1501127440",
+        "reason": "{{reason}}"
+    }
+}

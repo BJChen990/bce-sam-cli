@@ -1,0 +1,20 @@
+{
+    "resource": "{{resource}}",
+    "path": "/{{path}}",
+    "httpMethod": "{{method}}",
+    "headers": {
+        "App": "HTTP-Trigger",
+        "Connection": "close",
+        "Content-Length": "12",
+        "Content-Type": "text/plain; charset=utf-8",
+        "User-Agent": "Custom User Agent String",
+        "X-Bce-Request-Id": "ee2637aa-4ec7-434e-a210-039203f5c449"
+    },
+    "queryStringParameters": {
+        "foo": "bar"
+    },
+    "pathParameters": {},
+    "requestContext": {},
+    "body": "{{body}}",
+    "isBase64Encoded": false
+}

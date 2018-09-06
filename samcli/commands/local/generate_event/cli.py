@@ -9,20 +9,20 @@ from samcli.commands.local.generate_event.event_generation import GenerateEventC
 
 HELP_TEXT = """
 You can use this command to generate sample payloads from different event sources
-such as S3, API Gateway, and SNS. These payloads contain the information that the
-event sources send to your Lambda functions.\n
+such as BOS, DuerOS, and HTTP trigger. These payloads contain the information that the
+event sources send to your CFC functions.\n
 \b
-Generate the event that S3 sends to your Lambda function when a new object is uploaded
-$ sam local generate-event s3 [put/delete]\n
+Generate the event that BOS sends to your CFC function when a new object is uploaded
+$ sam local generate-event bos put\n
 \b
 You can even customize the event by adding parameter flags. To find which flags apply to your command,
 run:\n
-$ sam local generate-event s3 [put/delete] --help\n
+$ sam local generate-event bos put --help\n
 Then you can add in those flags that you wish to customize using\n
-$ sam local generate-event s3 [put/delete] --bucket <bucket> --key <key>\n
+$ sam local generate-event bos put --bucket <bucket> --object <object>\n
 \b
-After you generate a sample event, you can use it to test your Lambda function locally
-$ sam local generate-event s3 [put/delete] --bucket <bucket> --key <key> | sam local invoke <function logical id>
+After you generate a sample event, you can use it to test your CFC function locally
+$ sam local generate-event bos put --bucket <bucket> --object <object> | sam local invoke <function logical id>
 """
 
 
