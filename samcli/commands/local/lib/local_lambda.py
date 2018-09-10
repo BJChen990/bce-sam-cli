@@ -6,6 +6,9 @@ import os
 import logging
 import boto3
 
+from samcli.lib.samlib.cfc_credential_helper import get_credentials
+from samcli.lib.samlib.cfc_credential_helper import get_region
+
 from samcli.local.lambdafn.env_vars import EnvironmentVariables
 from samcli.local.lambdafn.config import FunctionConfig
 from samcli.local.lambdafn.exceptions import FunctionNotFound
@@ -151,7 +154,7 @@ class LocalLambdaRunner(object):
             overrides = self.env_vars_values.get(name, None)
 
         shell_env = os.environ
-        aws_creds = self.get_aws_creds()
+        creds = self.get_bce_creds()
 
         return EnvironmentVariables(function.memory,
                                     function.timeout,
@@ -159,7 +162,7 @@ class LocalLambdaRunner(object):
                                     variables=variables,
                                     shell_env_values=shell_env,
                                     override_values=overrides,
-                                    bce_creds=aws_creds)
+                                    bce_creds=creds)
 
     def _get_code_path(self, codeuri):
         """
@@ -187,43 +190,28 @@ class LocalLambdaRunner(object):
 
         return codeuri
 
-    def get_aws_creds(self):
+    def get_bce_creds(self):
         """
-        Returns AWS credentials obtained from the shell environment or given profile
+        Returns BCE credentials obtained from the shell environment or given profile
 
         :return dict: A dictionary containing credentials. This dict has the structure
              {"region": "", "key": "", "secret": "", "sessiontoken": ""}. If credentials could not be resolved,
              this returns None
         """
+
         result = {}
+        bce_credentials = get_credentials()
+        if bce_credentials.access_key_id != "" :
+            result["key"] = bce_credentials.access_key_id
 
-        LOG.debug("Loading BCE credentials from session with profile '%s'", self.aws_profile)
-        # TODO: Consider changing it to use boto3 default session. We already have an annotation
-        # to pass command line arguments for region & profile to setup boto3 default session
-        session = boto3.session.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+        if bce_credentials.secret_access_key != "" :
+            result["secret"] = bce_credentials.secret_access_key
 
-        if not session:
-            return result
+        if bce_credentials.session_token != "" :
+            result["token"] = bce_credentials.session_token
 
-        # Load the credentials from profile/environment
-        creds = session.get_credentials()
-
-        if not creds:
-            # If we were unable to load credentials, then just return empty. We will use the default
-            return result
-
-        # After loading credentials, region name might be available here.
-        if hasattr(session, 'region_name') and session.region_name:
-            result["region"] = session.region_name
-
-        # Only add the key, if its value is present
-        if hasattr(creds, 'access_key') and creds.access_key:
-            result["key"] = creds.access_key
-
-        if hasattr(creds, 'secret_key') and creds.secret_key:
-            result["secret"] = creds.secret_key
-
-        if hasattr(creds, 'token') and creds.token:
-            result["sessiontoken"] = creds.token
+        user_region = get_region()
+        if user_region != "" :
+            result["region"] = user_region
 
         return result

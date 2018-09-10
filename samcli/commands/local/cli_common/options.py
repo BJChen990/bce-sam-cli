@@ -52,7 +52,7 @@ def template_click_option():
                         envvar="SAM_TEMPLATE_FILE",
                         callback=get_or_default_template_file_name,
                         show_default=True,
-                        help="AWS SAM template file")
+                        help="BCE SAM template file")
 
 
 def service_common_options(port):

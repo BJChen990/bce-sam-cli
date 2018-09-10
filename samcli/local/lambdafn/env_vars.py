@@ -143,7 +143,7 @@ class EnvironmentVariables(object):
 
         result = {
             # Variable that says this function is running in Local CFC
-            # "BCE_SAM_LOCAL": "true",
+            "BCE_SAM_LOCAL": "true",
 
             # Function configuration
             "BCE_CFC_FUNCTION_MEMORY_SIZE": str(self.memory),
@@ -156,7 +156,7 @@ class EnvironmentVariables(object):
 
             "BCE_ACCESS_KEY_ID": self.bce_creds.get("key", self._DEFAULT_BCE_CREDS["key"]),
 
-            "BCE_SECRET_ACCESS_KEY": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"])
+            "BCE_ACCESS_KEY_SECRET": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"])
 
             # Additional variables we don't fill in
             # "BCE_ACCOUNT_ID="

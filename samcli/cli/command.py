@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 # Commands that are bundled with the CLI by default
 _SAM_CLI_COMMAND_PACKAGES = {
     "samcli.commands.local.local",
-    "samcli.commands.validate.validate",
+    # "samcli.commands.validate.validate",
     "samcli.commands.init",
     "samcli.commands.deploy",
     "samcli.commands.package",
-    "samcli.commands.logs",
+    # "samcli.commands.logs",
 }
 
 
