@@ -17,7 +17,7 @@ SUPPORTED_RUNTIME = [r for r in RUNTIME_TEMPLATE_MAPPING]
 
 @click.command(context_settings=dict(help_option_names=[u'-h', u'--help']))
 @click.option('-l', '--location', help="Template location (git, mercurial, http(s), zip, path)")
-@click.option('-r', '--runtime', type=click.Choice(SUPPORTED_RUNTIME), default="nodejs8.10",
+@click.option('-r', '--runtime', type=click.Choice(SUPPORTED_RUNTIME), default="nodejs8.5",
               help="Lambda Runtime of your app")
 @click.option('-o', '--output-dir', default='.', type=click.Path(), help="Where to output the initialized app into")
 @click.option('-n', '--name', default="sam-app", help="Name of your project to be generated as a folder")
@@ -46,9 +46,9 @@ def cli(ctx, location, runtime, output_dir, name, no_input):
         Initializes a new SAM project using custom template in a Git/Mercurial repository
         \b
         # gh being expanded to github url
-        $ sam init --location gh:aws-samples/cookiecutter-aws-sam-python
+        $ sam init --location gh:bce-samples/cookiecutter-bce-sam-python
         \b
-        $ sam init --location git+ssh://git@github.com/aws-samples/cookiecutter-aws-sam-python.git
+        $ sam init --location git+ssh://git@github.com/bce-samples/cookiecutter-bce-sam-python.git
         \b
         $ sam init --location hg+ssh://hg@bitbucket.org/repo/template-name
         \b

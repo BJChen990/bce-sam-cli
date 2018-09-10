@@ -21,7 +21,7 @@ class InvalidSamTemplateException(UserException):
 
 class SamTemplateNotFoundException(UserException):
     """
-    The BSAM Template provided could not be found
+    The SAM Template provided could not be found
     """
     pass
 

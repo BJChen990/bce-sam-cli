@@ -360,4 +360,4 @@ class InvokeContext(object):
             docker_client.ping()
         # When Docker is not installed, a request.exceptions.ConnectionError is thrown.
         except (docker.errors.APIError, requests.exceptions.ConnectionError):
-            raise InvokeContextException("Running AWS SAM projects locally requires Docker. Have you got it installed?")
+            raise InvokeContextException("Running BCE SAM projects locally requires Docker. Have you got it installed?")

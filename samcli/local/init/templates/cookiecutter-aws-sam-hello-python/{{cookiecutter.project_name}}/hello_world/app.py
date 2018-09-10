@@ -1,15 +1,12 @@
 import json
 
-import requests
-
-
-def lambda_handler(event, context):
-    """Sample pure Lambda function
+def handler(event, context):
+    """Sample pure CFC function
 
     Parameters
     ----------
     event: dict, required
-        API Gateway Lambda Proxy Input Format
+        API Gateway CFC Proxy Input Format
 
         {
             "resource": "Resource path",
@@ -24,28 +21,28 @@ def lambda_handler(event, context):
             "isBase64Encoded": "A boolean flag to indicate if the applicable request payload is Base64-encode"
         }
 
-        https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+        https://docs.bce.baidu.com/apigateway/latest/developerguide/set-up-cfc-proxy-integrations.html#api-gateway-simple-proxy-for-cfc-input-format
 
     context: object, required
-        Lambda Context runtime methods and attributes
+        CFC Context runtime methods and attributes
 
     Attributes
     ----------
 
-    context.aws_request_id: str
-         Lambda request ID
+    context.bce_request_id: str
+         CFC request ID
     context.client_context: object
-         Additional context when invoked through AWS Mobile SDK
+         Additional context when invoked through BCE Mobile SDK
     context.function_name: str
-         Lambda function name
+         CFC function name
     context.function_version: str
          Function version identifier
     context.get_remaining_time_in_millis: function
          Time in milliseconds before function times out
     context.identity:
-         Cognito identity provider context when invoked through AWS Mobile SDK
+         Cognito identity provider context when invoked through BCE Mobile SDK
     context.invoked_function_arn: str
-         Function ARN
+         Function BRN
     context.log_group_name: str
          Cloudwatch Log group name
     context.log_stream_name: str
@@ -53,11 +50,11 @@ def lambda_handler(event, context):
     context.memory_limit_in_mb: int
         Function memory
 
-        https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+        https://docs.bce.baidu.com/cfc/latest/dg/python-context-object.html
 
     Returns
     ------
-    API Gateway Lambda Proxy Output Format: dict
+    API Gateway CFC Proxy Output Format: dict
         'statusCode' and 'body' are required
 
         {
@@ -67,21 +64,13 @@ def lambda_handler(event, context):
             "body": "..."
         }
 
-        # api-gateway-simple-proxy-for-lambda-output-format
-        https: // docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
+        # api-gateway-simple-proxy-for-cfc-output-format
+        https: // docs.bce.baidu.com/apigateway/latest/developerguide/set-up-cfc-proxy-integrations.html
     """
-
-    try:
-        ip = requests.get("http://checkip.amazonaws.com/")
-    except requests.RequestException as e:
-        # Send some context about this error to Lambda Logs
-        print(e)
-
-        raise e
 
     return {
         "statusCode": 200,
         "body": json.dumps(
-            {"message": "hello world", "location": ip.text.replace("\n", "")}
+            {"message": "hello world"}
         ),
     }

@@ -13,18 +13,19 @@ LOG = logging.getLogger(__name__)
 
 class SamFunctionProvider(FunctionProvider):
     """
-    Fetches and returns CFC Functions from a BSAM Template. The BSAM template passed to this provider is assumed
+    Fetches and returns CFC Functions from a SAM Template. The SAM template passed to this provider is assumed
     to be valid, normalized and a dictionary.
 
     It may or may not contain a function.
     """
 
-    _SERVERLESS_FUNCTION = "CFC::Function"
+    _SERVERLESS_FUNCTION = "BCE::Serverless::Function"
+    _CFC_FUNCTION = "BCE::CFC::Function"
     _DEFAULT_CODEURI = "."
 
     def __init__(self, template_dict):
         """
-        Initialize the class with BSAM template data. The BSAM template passed to this provider is assumed
+        Initialize the class with SAM template data. The SAM template passed to this provider is assumed
         to be valid, normalized and a dictionary. It should be normalized by running all pre-processing
         before passing to this class. The process of normalization will remove structures like ``Globals``, resolve
         intrinsic functions etc.
@@ -33,7 +34,7 @@ class SamFunctionProvider(FunctionProvider):
         After the class is initialized, any changes to the ``template_dict`` will not be reflected in here.
         You need to explicitly update the class with new template, if necessary.
 
-        :param dict template_dict: BSAM Template as a dictionary
+        :param dict template_dict: SAM Template as a dictionary
         """
 
         self.template_dict = SamBaseProvider.get_template(template_dict)
@@ -99,7 +100,7 @@ class SamFunctionProvider(FunctionProvider):
     @staticmethod
     def _convert_sam_function_resource(name, resource_properties):
         """
-        Converts a CFC::Serverless::Function resource to a Function configuration usable by the provider.
+        Converts a BCE::Serverless::Function resource to a Function configuration usable by the provider.
 
         :param string name: LogicalID of the resource NOTE: This is *not* the function name because not all functions
             declare a name

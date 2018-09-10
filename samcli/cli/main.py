@@ -42,11 +42,11 @@ def aws_creds_options(f):
 @pass_context
 def cli(ctx):
     """
-    AWS Serverless Application Model (SAM) CLI
+    BCE Serverless Application Model (SAM) CLI
 
-    The AWS Serverless Application Model extends AWS CloudFormation to provide a simplified way of defining the
-    Amazon API Gateway APIs, AWS Lambda functions, and Amazon DynamoDB tables needed by your serverless application.
+    The BCE Serverless Application Model provide a simplified way of defining the
+    CFC functions, triggers and other services needed by your serverless application.
     You can find more in-depth guide about the SAM specification here:
-    https://github.com/awslabs/serverless-application-model.
+    https://github.com/bcelabs/serverless-application-model.
     """
     pass

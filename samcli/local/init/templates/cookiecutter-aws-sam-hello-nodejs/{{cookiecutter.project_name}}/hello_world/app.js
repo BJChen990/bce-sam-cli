@@ -1,13 +1,3 @@
-{%- if cookiecutter.runtime == 'nodejs4.3' %}
-var axios = require('axios')
-var url = 'http://checkip.amazonaws.com/';
-var response;
-{%- else %}
-const axios = require('axios')
-const url = 'http://checkip.amazonaws.com/';
-let response;
-{%- endif %}
-
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -40,42 +30,14 @@ let response;
  * @returns {string} object.statusCode - HTTP Status Code to be returned to the client
  * @returns {Object} object.headers - HTTP Headers to be returned
  * @returns {Object} object.body - JSON Payload to be returned
- * 
+ *
  */
-{%- if cookiecutter.runtime == 'nodejs6.10' or cookiecutter.runtime == 'nodejs4.3' %}
-exports.lambdaHandler = function (event, context, callback) {
-    axios(url)
-        .then(function (ret) {
-            response = {
-                'statusCode': 200,
-                'body': JSON.stringify({
-                    message: 'hello world',
-                    location: ret.data.trim()
-                })
-            }
-            callback(null, response);
+exports.handler = function (event, context, callback) {
+    response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: 'hello world'
         })
-        .catch(function (err) {
-            console.log(err);
-            callback(err);
-        });
-};
-{%- else %}
-exports.lambdaHandler = async (event, context) => {
-    try {
-        const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
     }
-
-    return response
+    callback(null, response);
 };
-{% endif %}

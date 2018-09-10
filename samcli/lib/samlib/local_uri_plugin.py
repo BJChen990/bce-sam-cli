@@ -8,7 +8,7 @@ from samtranslator.public.plugins import BasePlugin
 
 class SupportLocalUriPlugin(BasePlugin):
 
-    _SERVERLESS_FUNCTION = "CFC::Function"
+    _SERVERLESS_FUNCTION = "BCE::Serverless::Function"
 
     def __init__(self):
         """

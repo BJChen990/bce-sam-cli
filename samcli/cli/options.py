@@ -40,7 +40,7 @@ def region_option(f):
 
     return click.option('--region',
                         expose_value=False,
-                        help='Set the AWS Region of the service (e.g. us-east-1).',
+                        help='Set the BCE Region of the service (e.g. bj).',
                         callback=callback)(f)
 
 

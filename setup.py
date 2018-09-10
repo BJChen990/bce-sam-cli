@@ -34,16 +34,16 @@ if os.getenv("SAM_CLI_DEV"):
     cmd_name = "samdev"
 
 setup(
-    name='aws-sam-cli',
+    name='bce-sam-cli',
     version=read_version(),
-    description='AWS SAM CLI is a CLI tool for local development and testing of Serverless applications',
+    description='BCE SAM CLI is a CLI tool for local development and testing of Serverless applications',
     long_description=read('README.rst'),
-    author='Amazon Web Services',
-    author_email='aws-sam-developers@amazon.com',
-    url='https://github.com/awslabs/aws-sam-cli',
+    author='Baidu Cloud Engine',
+    author_email='faas-rd@baidu.com',
+    url='https://github.com/bcelabs/bce-sam-cli',
     license=read('LICENSE'),
     packages=find_packages(exclude=('tests', 'docs')),
-    keywords="AWS SAM CLI",
+    keywords="BCE SAM CLI",
     # Support Python 2.7 and 3.6 or greater
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
     entry_points={

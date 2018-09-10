@@ -5,8 +5,8 @@ This is a sample template for {{ cookiecutter.project_name }} - Below is a brief
 ```bash
 .
 ├── README.md                   <-- This instructions file
-├── hello_world                 <-- Source code for a lambda function
-│   ├── app.js                  <-- Lambda function code
+├── hello_world                 <-- Source code for a cfc function
+│   ├── app.js                  <-- CFC function code
 │   ├── package.json            <-- NodeJS dependencies
 │   └── tests                   <-- Unit tests
 │       └── unit
@@ -16,7 +16,7 @@ This is a sample template for {{ cookiecutter.project_name }} - Below is a brief
 
 ## Requirements
 
-* AWS CLI already configured with at least PowerUser permission
+* BCE CLI already configured with at least PowerUser permission
 {%- if cookiecutter.runtime == 'nodejs6.10' %}
 * [NodeJS 6.10 installed](https://nodejs.org/en/download/releases/)
 {%- elif cookiecutter.runtime =='nodejs4.3' %}
@@ -48,7 +48,7 @@ sam local start-api
 
 If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
 
-**SAM CLI** is used to emulate both Lambda and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
+**SAM CLI** is used to emulate both CFC and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
 
 ```yaml
 ...
@@ -62,24 +62,24 @@ Events:
 
 ## Packaging and deployment
 
-AWS Lambda NodeJS runtime requires a flat folder with all dependencies including the application. SAM will use `CodeUri` property to know where to look up for both application and dependencies:
+BCE CFC NodeJS runtime requires a flat folder with all dependencies including the application. SAM will use `CodeUri` property to know where to look up for both application and dependencies:
 
 ```yaml
 ...
     FirstFunction:
-        Type: AWS::Serverless::Function
+        Type: BCE::Serverless::Function
         Properties:
             CodeUri: hello_world/
             ...
 ```
 
-Firstly, we need a `S3 bucket` where we can upload our Lambda functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
+Firstly, we need a `S3 bucket` where we can upload our CFC functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
 
 ```bash
 aws s3 mb s3://BUCKET_NAME
 ```
 
-Next, run the following command to package our Lambda function to S3:
+Next, run the following command to package our CFC function to S3:
 
 ```bash
 sam package \
@@ -118,9 +118,9 @@ npm run test
 
 # Appendix
 
-## AWS CLI commands
+## BCE CLI commands
 
-AWS CLI commands to package, deploy and describe outputs defined within the cloudformation stack:
+BCE CLI commands to package, deploy and describe outputs defined within the cloudformation stack:
 
 ```bash
 sam package \
@@ -150,4 +150,4 @@ Here are a few ideas that you can use to get more acquainted as to how this over
 
 Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
 
-* [AWS Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
+* [BCE Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
