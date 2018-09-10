@@ -13,19 +13,18 @@ LOG = logging.getLogger(__name__)
 
 class SamFunctionProvider(FunctionProvider):
     """
-    Fetches and returns Lambda Functions from a SAM Template. The SAM template passed to this provider is assumed
+    Fetches and returns CFC Functions from a BSAM Template. The BSAM template passed to this provider is assumed
     to be valid, normalized and a dictionary.
 
     It may or may not contain a function.
     """
 
-    _SERVERLESS_FUNCTION = "AWS::Serverless::Function"
-    _LAMBDA_FUNCTION = "AWS::Lambda::Function"
+    _SERVERLESS_FUNCTION = "CFC::Function"
     _DEFAULT_CODEURI = "."
 
     def __init__(self, template_dict):
         """
-        Initialize the class with SAM template data. The SAM template passed to this provider is assumed
+        Initialize the class with BSAM template data. The BSAM template passed to this provider is assumed
         to be valid, normalized and a dictionary. It should be normalized by running all pre-processing
         before passing to this class. The process of normalization will remove structures like ``Globals``, resolve
         intrinsic functions etc.
@@ -34,7 +33,7 @@ class SamFunctionProvider(FunctionProvider):
         After the class is initialized, any changes to the ``template_dict`` will not be reflected in here.
         You need to explicitly update the class with new template, if necessary.
 
-        :param dict template_dict: SAM Template as a dictionary
+        :param dict template_dict: BSAM Template as a dictionary
         """
 
         self.template_dict = SamBaseProvider.get_template(template_dict)
@@ -93,9 +92,6 @@ class SamFunctionProvider(FunctionProvider):
             if resource_type == SamFunctionProvider._SERVERLESS_FUNCTION:
                 result[name] = SamFunctionProvider._convert_sam_function_resource(name, resource_properties)
 
-            elif resource_type == SamFunctionProvider._LAMBDA_FUNCTION:
-                result[name] = SamFunctionProvider._convert_lambda_function_resource(name, resource_properties)
-
             # We don't care about other resource types. Just ignore them
 
         return result
@@ -103,7 +99,7 @@ class SamFunctionProvider(FunctionProvider):
     @staticmethod
     def _convert_sam_function_resource(name, resource_properties):
         """
-        Converts a AWS::Serverless::Function resource to a Function configuration usable by the provider.
+        Converts a CFC::Serverless::Function resource to a Function configuration usable by the provider.
 
         :param string name: LogicalID of the resource NOTE: This is *not* the function name because not all functions
             declare a name
@@ -113,43 +109,16 @@ class SamFunctionProvider(FunctionProvider):
 
         codeuri = resource_properties.get("CodeUri", SamFunctionProvider._DEFAULT_CODEURI)
 
-        # CodeUri can be a dictionary of S3 Bucket/Key or a S3 URI, neither of which are supported
+        # CodeUri can be a dictionary of BOS Bucket/Key or a BOS URI, neither of which are supported
+        # TODO 支持将CodeUri改为符合BOS的格式
         if isinstance(codeuri, dict) or \
-                (isinstance(codeuri, six.string_types) and codeuri.startswith("s3://")):
+                (isinstance(codeuri, six.string_types) and codeuri.startswith("bos://")):
 
             codeuri = SamFunctionProvider._DEFAULT_CODEURI
-            LOG.warning("Lambda function '%s' has specified S3 location for CodeUri which is unsupported. "
+            LOG.warning("CFC function '%s' has specified BOS location for CodeUri which is unsupported. "
                         "Using default value of '%s' instead", name, codeuri)
 
-        LOG.debug("Found Serverless function with name='%s' and CodeUri='%s'", name, codeuri)
-
-        return Function(
-            name=name,
-            runtime=resource_properties.get("Runtime"),
-            memory=resource_properties.get("MemorySize"),
-            timeout=resource_properties.get("Timeout"),
-            handler=resource_properties.get("Handler"),
-            codeuri=codeuri,
-            environment=resource_properties.get("Environment"),
-            rolearn=resource_properties.get("Role")
-        )
-
-    @staticmethod
-    def _convert_lambda_function_resource(name, resource_properties):  # pylint: disable=invalid-name
-        """
-        Converts a AWS::Serverless::Function resource to a Function configuration usable by the provider.
-
-        :param string name: LogicalID of the resource NOTE: This is *not* the function name because not all functions
-            declare a name
-        :param dict resource_properties: Properties of this resource
-        :return samcli.commands.local.lib.provider.Function: Function configuration
-        """
-
-        # CodeUri is set to "." in order to get code locally from current directory. AWS::Lambda::Function's ``Code``
-        # property does not support specifying a local path
-        codeuri = SamFunctionProvider._DEFAULT_CODEURI
-
-        LOG.debug("Found Lambda function with name='%s' and CodeUri='%s'", name, codeuri)
+        LOG.debug("Found CFC function with name='%s' and CodeUri='%s'", name, codeuri)
 
         return Function(
             name=name,

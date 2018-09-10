@@ -78,6 +78,8 @@ class ContainerManager(object):
         :param stream: Optional stream to write output to. Defaults to stderr
         :raises DockerImageNotFoundException: If the Docker image was not available in the server
         """
+        # TODO 从baidu内部的registry下载镜像，docker pull myregistry.local:5000/testing/test-image
+
         stream = stream or sys.stderr
         try:
             result_itr = self.docker_client.api.pull(image_name, stream=True, decode=True)

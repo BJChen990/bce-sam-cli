@@ -8,7 +8,7 @@ from samtranslator.public.plugins import BasePlugin
 
 class SupportLocalUriPlugin(BasePlugin):
 
-    _SERVERLESS_FUNCTION = "AWS::Serverless::Function"
+    _SERVERLESS_FUNCTION = "CFC::Function"
 
     def __init__(self):
         """
