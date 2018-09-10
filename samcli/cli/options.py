@@ -57,5 +57,5 @@ def profile_option(f):
 
     return click.option('--profile',
                         expose_value=False,
-                        help='Select a specific profile from your credential file to get AWS credentials.',
+                        help='Select a specific profile from your credential file to get BCE credentials.',
                         callback=callback)(f)

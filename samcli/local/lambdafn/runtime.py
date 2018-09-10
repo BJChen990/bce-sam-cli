@@ -1,5 +1,5 @@
 """
-Classes representing a local Lambda runtime
+Classes representing a local CFC runtime
 """
 
 import os
@@ -8,26 +8,27 @@ import tempfile
 import signal
 import logging
 import threading
+import json
 from contextlib import contextmanager
 
-from samcli.local.docker.lambda_container import LambdaContainer
+from samcli.local.docker.cfc_container import CfcContainer
 from .zip import unzip
 
 LOG = logging.getLogger(__name__)
 
 
-class LambdaRuntime(object):
+class CfcRuntime(object):
     """
-    This class represents a Local Lambda runtime. It can run the Lambda function code locally in a Docker container
-    and return results. Public methods exposed by this class are similar to the AWS Lambda APIs, for convenience only.
-    This class is **not** intended to be an local replica of the Lambda APIs.
+    This class represents a Local CFC runtime. It can run the CFC function code locally in a Docker container
+    and return results. Public methods exposed by this class are similar to the BCE CFC APIs, for convenience only.
+    This class is **not** intended to be an local replica of the CFC APIs.
     """
 
     SUPPORTED_ARCHIVE_EXTENSIONS = (".zip", ".jar", ".ZIP", ".JAR")
 
     def __init__(self, container_manager):
         """
-        Initialize the Local Lambda runtime
+        Initialize the Local CFC runtime
 
         :param samcli.local.docker.manager.ContainerManager container_manager: Instance of the ContainerManager class
             that can run a local Docker container
@@ -36,22 +37,23 @@ class LambdaRuntime(object):
 
     def invoke(self,
                function_config,
+               cwd,
                event,
                debug_context=None,
                stdout=None,
                stderr=None):
         """
-        Invoke the given Lambda function locally.
+        Invoke the given CFC function locally.
 
         ##### NOTE: THIS IS A LONG BLOCKING CALL #####
-        This method will block until either the Lambda function completes or timed out, which could be seconds.
+        This method will block until either the CFC function completes or timed out, which could be seconds.
         A blocking call will block the thread preventing any other operations from happening. If you are using this
         method in a web-server or in contexts where your application needs to be responsive when function is running,
         take care to invoke the function in a separate thread. Co-Routines or micro-threads might not perform well
         because the underlying implementation essentially blocks on a socket, which is synchronous.
 
         :param FunctionConfig function_config: Configuration of the function to invoke
-        :param event: String input event passed to Lambda function
+        :param event: String input event passed to CFC function
         :param DebugContext debug_context: Debugging context for the function (includes port, args, and path)
         :param io.IOBase stdout: Optional. IO Stream to that receives stdout text from container.
         :param io.IOBase stderr: Optional. IO Stream that receives stderr text from container
@@ -61,14 +63,17 @@ class LambdaRuntime(object):
 
         # Update with event input
         environ = function_config.env_vars
-        environ.add_lambda_event_body(event)
+        environ.add_cfc_event_body(event)
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
+        conf_dir = os.path.join(cwd, "conf")
+        self._create_conf(conf_dir, function_config)
 
         with self._get_code_dir(function_config.code_abs_path) as code_dir:
-            container = LambdaContainer(function_config.runtime,
+            container = CfcContainer(function_config.runtime,
                                         function_config.handler,
                                         code_dir,
+                                        conf_dir,
                                         memory_mb=function_config.memory,
                                         env_vars=env_vars,
                                         debug_options=debug_context)
@@ -81,7 +86,7 @@ class LambdaRuntime(object):
                 # Setup appropriate interrupt - timeout or Ctrl+C - before function starts executing.
                 #
                 # Start the timer **after** container starts. Container startup takes several seconds, only after which,
-                # our Lambda function code will run. Starting the timer is a reasonable approximation that function has
+                # our CFC function code will run. Starting the timer is a reasonable approximation that function has
                 # started running.
                 timer = self._configure_interrupt(function_config.name,
                                                   function_config.timeout,
@@ -97,7 +102,7 @@ class LambdaRuntime(object):
                 # When user presses Ctrl+C, we receive a Keyboard Interrupt. This is especially very common when
                 # container is in debugging mode. We have special handling of Ctrl+C. So handle KeyboardInterrupt
                 # and swallow the exception. The ``finally`` block will also take care of cleaning it up.
-                LOG.debug("Ctrl+C was pressed. Aborting Lambda execution")
+                LOG.debug("Ctrl+C was pressed. Aborting CFC execution")
 
             finally:
                 # We will be done with execution, if either the execution completed or an interrupt was fired
@@ -110,7 +115,7 @@ class LambdaRuntime(object):
 
     def _configure_interrupt(self, function_name, timeout, container, is_debugging):
         """
-        When a Lambda function is executing, we setup certain interrupt handlers to stop the execution.
+        When a CFC function is executing, we setup certain interrupt handlers to stop the execution.
         Usually, we setup a function timeout interrupt to kill the container after timeout expires. If debugging though,
         we don't enforce a timeout. But we setup a SIGINT interrupt to catch Ctrl+C and terminate the container.
 
@@ -144,7 +149,7 @@ class LambdaRuntime(object):
     @contextmanager
     def _get_code_dir(self, code_path):
         """
-        Method to get a path to a directory where the Lambda function code is available. This directory will
+        Method to get a path to a directory where the CFC function code is available. This directory will
         be mounted directly inside the Docker container.
 
         This method handles a few different cases for ``code_path``:
@@ -155,7 +160,7 @@ class LambdaRuntime(object):
 
         :param string code_path: Path to the code. This could be pointing at a file or folder either on a local
             disk or in some network file system
-        :return string: Directory containing Lambda function code. It can be mounted directly in container
+        :return string: Directory containing CFC function code. It can be mounted directly in container
         """
 
         decompressed_dir = None
@@ -173,6 +178,33 @@ class LambdaRuntime(object):
             if decompressed_dir:
                 shutil.rmtree(decompressed_dir)
 
+    def _create_conf(self, conf_dir, function_config):
+        if not os.path.exists(conf_dir):
+            os.makedirs(conf_dir)
+
+        env_conf_path = os.path.join(conf_dir, "env.conf")
+        meta_conf_path = os.path.join(conf_dir, "meta.conf")
+
+        with open(env_conf_path, 'w') as env_conf:
+            env_dict = {
+                "BCE_RUNTIME_START_TIME": "1233454646",
+	            "BCE_USER_CODE_ROOT": "/var/task",
+	            "BCE_RUNTIME_INVOKER_SOCKS": "/var/tmp/.server.sock",
+	            "BCE_RUNTIME_FUNCLET_SOCKS": "/var/tmp/funclet.sock",
+	            "BCE_RUNTIME_NAME": "test_pod"
+            }
+            json.dump(env_dict, env_conf)
+
+        with open(meta_conf_path, 'w') as meta_conf:
+            # 读函数 metadata
+            meta_dict = {
+                "FunctionName":function_config.name,
+                "MemorySize":function_config.memory,
+                "Version":"$LATEST",
+                "Handler":function_config.handler,
+                "CommitId":"12345678-7f27-43f5-ad72-f6e5d0638ce8"
+            }
+            json.dump(meta_dict, meta_conf)
 
 def _unzip_file(filepath):
     """

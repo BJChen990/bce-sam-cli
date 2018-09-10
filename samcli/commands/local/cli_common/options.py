@@ -58,7 +58,7 @@ def template_click_option():
 def service_common_options(port):
     def construct_options(f):
         """
-        Common CLI Options that are shared for service related commands ('start-api' and 'start_lambda')
+        Common CLI Options that are shared for service related commands ('start-api' and 'start_cfc')
 
         Parameters
         ----------
@@ -101,19 +101,19 @@ def invoke_common_options(f):
 
         click.option('--env-vars', '-n',
                      type=click.Path(exists=True),
-                     help="JSON file containing values for Lambda function's environment variables."),
+                     help="JSON file containing values for CFC function's environment variables."),
 
-        click.option('--debug-port', '-d',
-                     help="When specified, Lambda function container will start in debug mode and will expose this "
-                          "port on localhost.",
-                     envvar="SAM_DEBUG_PORT"),
+        # click.option('--debug-port', '-d',
+        #              help="When specified, CFC function container will start in debug mode and will expose this "
+        #                   "port on localhost.",
+        #              envvar="SAM_DEBUG_PORT"),
 
-        click.option('--debugger-path',
-                     help="Host path to a debugger that will be mounted into the Lambda container."),
+        # click.option('--debugger-path',
+        #              help="Host path to a debugger that will be mounted into the CFC container."),
 
-        click.option('--debug-args',
-                     help="Additional arguments to be passed to the debugger.",
-                     envvar="DEBUGGER_ARGS"),
+        # click.option('--debug-args',
+        #              help="Additional arguments to be passed to the debugger.",
+        #              envvar="DEBUGGER_ARGS"),
 
         click.option('--docker-volume-basedir', '-v',
                      envvar="SAM_DOCKER_VOLUME_BASEDIR",
@@ -123,23 +123,23 @@ def invoke_common_options(f):
 
         click.option('--docker-network',
                      envvar="SAM_DOCKER_NETWORK",
-                     help="Specifies the name or id of an existing docker network to lambda docker "
+                     help="Specifies the name or id of an existing docker network to cfc docker "
                           "containers should connect to, along with the default bridge network. If not specified, "
-                          "the Lambda containers will only connect to the default bridge docker network."),
+                          "the CFC containers will only connect to the default bridge docker network."),
 
         click.option('--log-file', '-l',
                      help="logfile to send runtime logs to."),
 
         click.option('--skip-pull-image',
                      is_flag=True,
-                     help="Specify whether CLI should skip pulling down the latest Docker image for Lambda runtime.",
+                     help="Specify whether CLI should skip pulling down the latest Docker image for CFC runtime.",
                      envvar="SAM_SKIP_PULL_IMAGE"),
 
         click.option('--profile',
-                     help="Specify which AWS credentials profile to use."),
+                     help="Specify which BCE credentials profile to use."),
 
         click.option('--region',
-                     help="Specify which AWS region to use."),
+                     help="Specify which BCE region to use."),
 
     ]
 

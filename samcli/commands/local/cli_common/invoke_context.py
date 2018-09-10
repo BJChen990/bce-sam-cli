@@ -14,7 +14,7 @@ import requests
 from samcli.yamlhelper import yaml_parse
 from samcli.commands.local.lib.local_lambda import LocalLambdaRunner
 from samcli.commands.local.lib.debug_context import DebugContext
-from samcli.local.lambdafn.runtime import LambdaRuntime
+from samcli.local.lambdafn.runtime import CfcRuntime
 from samcli.local.docker.manager import ContainerManager
 from .user_exceptions import InvokeContextException, DebugContextException
 from ..lib.sam_function_provider import SamFunctionProvider
@@ -174,8 +174,8 @@ class InvokeContext(object):
         container_manager = ContainerManager(docker_network_id=self._docker_network,
                                              skip_pull_image=self._skip_pull_image)
 
-        lambda_runtime = LambdaRuntime(container_manager)
-        return LocalLambdaRunner(local_runtime=lambda_runtime,
+        cfc_runtime = CfcRuntime(container_manager)
+        return LocalLambdaRunner(local_runtime=cfc_runtime,
                                  function_provider=self._function_provider,
                                  cwd=self.get_cwd(),
                                  env_vars_values=self._env_vars_value,

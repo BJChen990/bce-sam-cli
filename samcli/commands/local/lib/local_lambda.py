@@ -77,7 +77,7 @@ class LocalLambdaRunner(object):
         config = self._get_invoke_config(function)
 
         # Invoke the function
-        self.local_runtime.invoke(config, event, debug_context=self.debug_context, stdout=stdout, stderr=stderr)
+        self.local_runtime.invoke(config, self.cwd, event, debug_context=self.debug_context, stdout=stdout, stderr=stderr)
 
     def is_debugging(self):
         """
@@ -159,7 +159,7 @@ class LocalLambdaRunner(object):
                                     variables=variables,
                                     shell_env_values=shell_env,
                                     override_values=overrides,
-                                    aws_creds=aws_creds)
+                                    bce_creds=aws_creds)
 
     def _get_code_path(self, codeuri):
         """
@@ -197,7 +197,7 @@ class LocalLambdaRunner(object):
         """
         result = {}
 
-        LOG.debug("Loading AWS credentials from session with profile '%s'", self.aws_profile)
+        LOG.debug("Loading BCE credentials from session with profile '%s'", self.aws_profile)
         # TODO: Consider changing it to use boto3 default session. We already have an annotation
         # to pass command line arguments for region & profile to setup boto3 default session
         session = boto3.session.Session(profile_name=self.aws_profile, region_name=self.aws_region)

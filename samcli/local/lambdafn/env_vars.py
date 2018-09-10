@@ -1,5 +1,5 @@
 """
-Supplies the environment variables necessary to set up Local Lambda runtime
+Supplies the environment variables necessary to set up Local CFC runtime
 """
 
 import sys
@@ -7,7 +7,7 @@ import sys
 
 class EnvironmentVariables(object):
     """
-    Use this class to get the environment variables necessary to run the Lambda function. It returns the AWS specific
+    Use this class to get the environment variables necessary to run the CFC function. It returns the BCE specific
     variables (credentials, regions, etc) along with any environment variables configured on the function.
 
     Customers define the name of the environment variables along with default values, if any, when creating the
@@ -23,16 +23,16 @@ class EnvironmentVariables(object):
     If a variable does *not* get a value from either of the above mechanisms, it is given a value of "" (empty string).
     If the value of a variable is an intrinsic function dict/list, then it is given a value of "" (empty string).
 
-    If real AWS Credentials were supplied, this class will expose them through appropriate environment variables.
-    If not, this class will provide the following placeholder values to AWS Credentials:
-        region = "us-east-1"
+    If real bce Credentials were supplied, this class will expose them through appropriate environment variables.
+    If not, this class will provide the following placeholder values to bce Credentials:
+        region = "bj"
         key = "defaultkey"
         secret = "defaultsecret"
     """
 
     _BLANK_VALUE = ""
-    _DEFAULT_AWS_CREDS = {
-        "region": "us-east-1",
+    _DEFAULT_BCE_CREDS = {
+        "region": "bj",
         "key": "defaultkey",
         "secret": "defaultsecret"
     }
@@ -44,7 +44,7 @@ class EnvironmentVariables(object):
                  variables=None,
                  shell_env_values=None,
                  override_values=None,
-                 aws_creds=None):
+                 bce_creds=None):
         """
         Initializes this class. It takes in two sets of properties:
             a) (Required) Function information
@@ -59,7 +59,7 @@ class EnvironmentVariables(object):
             environment.
         :param dict override_values: Optional. Dict containing values for the variables that will override the values
             from ``default_values`` and ``shell_env_values``.
-        :param dict aws_creds: Optional. Dictionary containing AWS credentials passed to the Lambda runtime through
+        :param dict bce_creds: Optional. Dictionary containing bce credentials passed to the CFC runtime through
             environment variables. It should contain "key", "secret", "region" and optional "sessiontoken" keys
         """
 
@@ -72,7 +72,7 @@ class EnvironmentVariables(object):
         self.variables = variables or {}
         self.shell_env_values = shell_env_values or {}
         self.override_values = override_values or {}
-        self.aws_creds = aws_creds or {}
+        self.bce_creds = bce_creds or {}
 
     def resolve(self):
         """
@@ -83,8 +83,8 @@ class EnvironmentVariables(object):
             are strings
         """
 
-        # AWS_* variables must always be passed to the function, but user has the choice to override them
-        result = self._get_aws_variables()
+        # BCE_* variables must always be passed to the function, but user has the choice to override them
+        result = self._get_bce_variables()
 
         # Default value for the variable gets lowest priority
         for name, value in self.variables.items():
@@ -97,17 +97,17 @@ class EnvironmentVariables(object):
             if name in self.override_values:
                 value = self.override_values[name]
 
-            # Any value must be a string when passed to Lambda runtime.
+            # Any value must be a string when passed to CFC runtime.
             # Runtime expects a Map<String, String> for environment variables
             result[name] = self._stringify_value(value)
 
         return result
 
-    def add_lambda_event_body(self, value):
+    def add_cfc_event_body(self, value):
         """
-        Adds the value of AWS_LAMBDA_EVENT_BODY environment variable.
+        Adds the value of BCE_CFC_EVENT_BODY environment variable.
         """
-        self.variables["AWS_LAMBDA_EVENT_BODY"] = value
+        self.variables["BCE_EVENT_BODY"] = value
 
     @property
     def timeout(self):
@@ -133,49 +133,47 @@ class EnvironmentVariables(object):
     def handler(self, value):
         self._function["handler"] = value
 
-    def _get_aws_variables(self):
+    def _get_bce_variables(self):
         """
-        Returns the AWS specific environment variables that should be available in the Lambda runtime.
-        They are prefixed it "AWS_*".
+        Returns the BCE specific environment variables that should be available in the CFC runtime.
+        They are prefixed it "BCE_*".
 
-        :return dict: Name and value of AWS environment variable
+        :return dict: Name and value of BCE environment variable
         """
 
         result = {
-            # Variable that says this function is running in Local Lambda
-            "AWS_SAM_LOCAL": "true",
+            # Variable that says this function is running in Local CFC
+            # "BCE_SAM_LOCAL": "true",
 
             # Function configuration
-            "AWS_LAMBDA_FUNCTION_MEMORY_SIZE": str(self.memory),
-            "AWS_LAMBDA_FUNCTION_TIMEOUT": str(self.timeout),
-            "AWS_LAMBDA_FUNCTION_HANDLER": str(self._function["handler"]),
+            "BCE_CFC_FUNCTION_MEMORY_SIZE": str(self.memory),
+            "BCE_CFC_FUNCTION_TIMEOUT": str(self.timeout),
 
-            # AWS Credentials - Use the input credentials or use the defaults
-            "AWS_REGION": self.aws_creds.get("region", self._DEFAULT_AWS_CREDS["region"]),
+            # BCE Credentials - Use the input credentials or use the defaults
+            "BCE_REGION": self.bce_creds.get("region", self._DEFAULT_BCE_CREDS["region"]),
 
-            "AWS_DEFAULT_REGION": self.aws_creds.get("region", self._DEFAULT_AWS_CREDS["region"]),
+            "BCE_DEFAULT_REGION": self.bce_creds.get("region", self._DEFAULT_BCE_CREDS["region"]),
 
-            "AWS_ACCESS_KEY_ID": self.aws_creds.get("key", self._DEFAULT_AWS_CREDS["key"]),
+            "BCE_ACCESS_KEY_ID": self.bce_creds.get("key", self._DEFAULT_BCE_CREDS["key"]),
 
-            "AWS_SECRET_ACCESS_KEY": self.aws_creds.get("secret", self._DEFAULT_AWS_CREDS["secret"])
+            "BCE_SECRET_ACCESS_KEY": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"])
 
             # Additional variables we don't fill in
-            # "AWS_ACCOUNT_ID="
-            # "AWS_LAMBDA_EVENT_BODY=",
-            # "AWS_LAMBDA_FUNCTION_NAME=",
-            # "AWS_LAMBDA_FUNCTION_VERSION=",
+            # "BCE_ACCOUNT_ID="
+            # "BCE_CFC_FUNCTION_NAME=",
+            # "BCE_CFC_FUNCTION_VERSION=",
         }
 
         # Session Token should be added **only** if the input creds have a token and the value is not empty.
-        if self.aws_creds.get("sessiontoken"):
-            result["AWS_SESSION_TOKEN"] = self.aws_creds.get("sessiontoken")
+        if self.bce_creds.get("sessiontoken"):
+            result["BCE_SESSION_TOKEN"] = self.bce_creds.get("sessiontoken")
 
         return result
 
     def _stringify_value(self, value):
         """
         This method stringifies values of environment variables. If the value of the method is a list or dictionary,
-        then this method will replace it with empty string. Values of environment variables in Lambda must be a string.
+        then this method will replace it with empty string. Values of environment variables in CFC must be a string.
         List or dictionary usually means they are intrinsic functions which have not been resolved.
 
         :param value: Value to stringify

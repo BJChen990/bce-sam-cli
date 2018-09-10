@@ -1,5 +1,5 @@
 """
-Represents Lambda runtime containers.
+Represents Cfc runtime containers.
 """
 from enum import Enum
 
@@ -7,17 +7,9 @@ from .container import Container
 
 
 class Runtime(Enum):
-    nodejs = "nodejs"
-    nodejs43 = "nodejs4.3"
-    nodejs610 = "nodejs6.10"
-    nodejs810 = "nodejs8.10"
+    nodejs85 = "nodejs8.5"
     python27 = "python2.7"
-    python36 = "python3.6"
-    java8 = "java8"
-    go1x = "go1.x"
-    dotnetcore20 = "dotnetcore2.0"
-    dotnetcore21 = "dotnetcore2.1"
-
+    
     @classmethod
     def has_value(cls, value):
         """
@@ -29,18 +21,21 @@ class Runtime(Enum):
         return any(value == item.value for item in cls)
 
 
-class LambdaContainer(Container):
+class CfcContainer(Container):
     """
-    Represents a Lambda runtime container. This class knows how to setup entry points, environment variables,
-    exposed ports etc specific to Lambda runtime container. The container management functionality (create/start/stop)
+    Represents a Cfc runtime container. This class knows how to setup entry points, environment variables,
+    exposed ports etc specific to Cfc runtime container. The container management functionality (create/start/stop)
     is provided by the base class
     """
 
-    _IMAGE_REPO_NAME = "lambci/lambda"
+    _IMAGE_REPO_NAME = "bceci/cfc"
+
     _WORKING_DIR = "/var/task"
 
+    _CONTAINER_CONF_DIR = "/etc/faas"
+
     # The Volume Mount path for debug files in docker
-    _DEBUGGER_VOLUME_MOUNT_PATH = "/tmp/lambci_debug_files"
+    _DEBUGGER_VOLUME_MOUNT_PATH = "/tmp/lambdaci_debug_files"
     _DEFAULT_CONTAINER_DBG_GO_PATH = _DEBUGGER_VOLUME_MOUNT_PATH + "/dlv"
 
     # This is the dictionary that represents where the debugger_path arg is mounted in docker to as readonly.
@@ -50,38 +45,39 @@ class LambdaContainer(Container):
                  runtime,
                  handler,
                  code_dir,
+                 conf_dir,
                  memory_mb=128,
                  env_vars=None,
                  debug_options=None):
         """
         Initializes the class
 
-        :param string runtime: Name of the Lambda runtime
+        :param string runtime: Name of the CFC runtime
         :param string handler: Handler of the function to run
-        :param string code_dir: Directory where the Lambda function code is present. This directory will be mounted
+        :param string code_dir: Directory where the CFC function code is present. This directory will be mounted
             to the container to execute
-        :param int memory_mb: Optional. Max limit of memory in MegaBytes this Lambda function can use.
+        :param int memory_mb: Optional. Max limit of memory in MegaBytes this CFC function can use.
         :param dict env_vars: Optional. Dictionary containing environment variables passed to container
         :param DebugContext debug_options: Optional. Contains container debugging info (port, debugger path)
         """
 
         if not Runtime.has_value(runtime):
-            raise ValueError("Unsupported Lambda runtime {}".format(runtime))
+            raise ValueError("Unsupported CFC runtime {}".format(runtime))
 
-        image = LambdaContainer._get_image(runtime)
-        ports = LambdaContainer._get_exposed_ports(debug_options)
-        entry = LambdaContainer._get_entry_point(runtime, debug_options)
-        additional_options = LambdaContainer._get_additional_options(runtime, debug_options)
-        additional_volumes = LambdaContainer._get_additional_volumes(debug_options)
+        image = CfcContainer._get_image(runtime)
+        ports = CfcContainer._get_exposed_ports(debug_options)
+        additional_options = CfcContainer._get_additional_options(runtime, debug_options)
+        additional_volumes = CfcContainer._get_additional_volumes(debug_options)
         cmd = [handler]
 
-        super(LambdaContainer, self).__init__(image,
+        super(CfcContainer, self).__init__(image,
                                               cmd,
                                               self._WORKING_DIR,
                                               code_dir,
+                                              self._CONTAINER_CONF_DIR,
+                                              conf_dir,
                                               memory_limit_mb=memory_mb,
                                               exposed_ports=ports,
-                                              entrypoint=entry,
                                               env_vars=env_vars,
                                               container_opts=additional_options,
                                               additional_volumes=additional_volumes)
@@ -137,7 +133,7 @@ class LambdaContainer(Container):
             return None
 
         return {
-            debug_options.debugger_path: LambdaContainer._DEBUGGER_VOLUME_MOUNT
+            debug_options.debugger_path: CfcContainer._DEBUGGER_VOLUME_MOUNT
         }
 
     @staticmethod
@@ -148,7 +144,8 @@ class LambdaContainer(Container):
         :param string runtime: Name of the runtime
         :return: Name of Docker Image for the given runtime
         """
-        return "{}:{}".format(LambdaContainer._IMAGE_REPO_NAME, runtime)
+        return "{}:{}".format(CfcContainer._IMAGE_REPO_NAME, runtime)
+        
 
     @staticmethod
     def _get_entry_point(runtime, debug_options=None):
@@ -157,7 +154,7 @@ class LambdaContainer(Container):
         Dockerfile. We override this default specifically when enabling debugging. The overridden entry point includes
         a few extra flags to start the runtime in debug mode.
 
-        :param string runtime: Lambda function runtime name
+        :param string runtime: CFC function runtime name
         :param int debug_port: Optional, port for debugger
         :param string debug_args: Optional additional arguments passed to the entry point.
         :return list: List containing the new entry points. Each element in the list is one portion of the command.
@@ -198,7 +195,7 @@ class LambdaContainer(Container):
                 + [
                     "-debug=true",
                     "-delvePort=" + str(debug_port),
-                    "-delvePath=" + LambdaContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
+                    "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
                   ]
 
         elif runtime == Runtime.nodejs.value:

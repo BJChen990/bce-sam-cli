@@ -16,42 +16,41 @@ LOG = logging.getLogger(__name__)
 
 
 HELP_TEXT = """
-You can use this command to execute your function in a Lambda-like environment locally.
+You can use this command to execute your function in a CFC-like environment locally.
 You can pass in the event body via stdin or by using the -e (--event) parameter.
-Logs from the Lambda function will be output via stdout.\n
+Logs from the CFC function will be output via stdout.\n
 \b
-Invoking a Lambda function using an event file
+Invoking a CFC function using an event file
 $ sam local invoke "HelloWorldFunction" -e event.json\n
 \b
-Invoking a Lambda function using input from stdin
+Invoking a CFC function using input from stdin
 $ echo '{"message": "Hey, are you there?" }' | sam local invoke "HelloWorldFunction" \n
 """
 STDIN_FILE_NAME = "-"
 
 
-@click.command("invoke", help=HELP_TEXT, short_help="Invokes a local Lambda function once.")
+@click.command("invoke", help=HELP_TEXT, short_help="Invokes a local CFC function once.")
 @click.option("--event", '-e',
               type=click.Path(),
               default=STDIN_FILE_NAME,  # Defaults to stdin
-              help="JSON file containing event data passed to the Lambda function during invoke. If this option "
+              help="JSON file containing event data passed to the CFC function during invoke. If this option "
                    "is not specified, we will default to reading JSON from stdin")
 @click.option("--no-event", is_flag=True, default=False, help="Invoke Function with an empty event")
 @invoke_common_options
 @cli_framework_options
 @click.argument('function_identifier', required=False)
 @pass_context
-def cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port, debug_args, debugger_path,
+def cli(ctx, function_identifier, template, event, no_event, env_vars, 
         docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
 
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
-    do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port, debug_args, debugger_path,
+    do_cli(ctx, function_identifier, template, event, no_event, env_vars, 
            docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
 
 
-def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,  # pylint: disable=R0914
-           debug_args, debugger_path, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile,
-           region):
+def do_cli(ctx, function_identifier, template, event, no_event, env_vars,  # pylint: disable=R0914
+           docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
     """
     Implementation of the ``cli`` method, just separated out for unit testing purposes
     """
@@ -78,9 +77,6 @@ def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_
                            log_file=log_file,
                            skip_pull_image=skip_pull_image,
                            aws_profile=profile,
-                           debug_port=debug_port,
-                           debug_args=debug_args,
-                           debugger_path=debugger_path,
                            aws_region=region) as context:
 
             # Invoke the function
