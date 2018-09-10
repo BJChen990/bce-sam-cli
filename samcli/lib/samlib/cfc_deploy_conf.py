@@ -4,6 +4,7 @@ from baidubce.bce_client_configuration import BceClientConfiguration
 from baidubce.auth.bce_credentials import BceCredentials
 
 from samcli.yamlhelper import yaml_parse
+from samcli.lib.samlib.cfc_credential_helper import get_credentials
 from user_exceptions import DeployContextException
 
 # HOST = 'http://cfc.bj.baidubce.com'
@@ -19,17 +20,14 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 
 
-def _get_creditial():
-    with open(config_file, 'r') as fp:
-        try:
-            return yaml_parse(fp.read())
-        except (ValueError, yaml.YAMLError) as ex:
-            raise DeployContextException("Failed to parse yml: {}".format(str(ex)))
+# def _get_creditial():
+#     with open(config_file, 'r') as fp:
+#         try:
+#             return yaml_parse(fp.read())
+#         except (ValueError, yaml.YAMLError) as ex:
+#             raise DeployContextException("Failed to parse yml: {}".format(str(ex)))
 
 
 def get_config():
-    res = _get_creditial()
-    AK = res["AK"]
-    SK = res["SK"]
     HOST = 'http://cfc.bj.baidubce.com'  
-    return BceClientConfiguration(credentials=BceCredentials(AK, SK), endpoint=HOST)
+    return BceClientConfiguration(credentials=get_credentials(), endpoint=HOST)
