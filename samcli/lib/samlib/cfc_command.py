@@ -15,6 +15,7 @@ import cfc_deploy_conf
 from samcli.commands.exceptions import UserException
 from samcli.local.lambdafn.exceptions import FunctionNotFound
 from samcli.commands.validate.lib.exceptions import InvalidSamDocumentException
+from samcli.lib.samlib.cfc_credential_helper import get_region
 
 from deploy_context import DeployContext
 from user_exceptions import DeployContextException
@@ -98,12 +99,13 @@ def _create_function(cfc_client, function):
     user_memorysize = function.memory if function.memory != None else 128
     user_timeout = function.timeout if function.timeout != None else 3
     user_runtime = _deal_with_func_runtime(function.runtime)
+    user_region = get_region()
     
     create_response = cfc_client.create_function(function_name,
                                                  description="cfc function from bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
-                                                 region='bj',
+                                                 region=user_region,
                                                  zip_file=base64_file,
                                                  publish=False,
                                                  run_time=user_runtime,
