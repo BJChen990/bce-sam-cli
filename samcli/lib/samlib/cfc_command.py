@@ -171,7 +171,7 @@ def _deal_with_func_runtime(function_runtime):
     if function_runtime in ('nodejs','nodejs6','nodejs6.11'):
         return 'nodejs6.11'
     if function_runtime in ('nodejs8','nodejs8.5'):
-        return 'nodejs8.5'
+        return 'nodejs8.4'
     else:
         raise UserException("Function runtime not supported")
 
