@@ -158,8 +158,8 @@ class EnvironmentVariables(object):
         }
 
         # Session Token should be added **only** if the input creds have a token and the value is not empty.
-        if self.bce_creds.get("sessiontoken"):
-            result["BCE_SESSION_TOKEN"] = self.bce_creds.get("sessiontoken")
+        if self.bce_creds.get("token"):
+            result["BCE_SESSION_TOKEN"] = self.bce_creds.get("token")
 
         return result
 
