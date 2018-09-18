@@ -7,7 +7,6 @@ import logging
 import boto3
 
 from samcli.lib.samlib.cfc_credential_helper import get_credentials
-from samcli.lib.samlib.cfc_credential_helper import get_region
 
 from samcli.local.lambdafn.env_vars import EnvironmentVariables
 from samcli.local.lambdafn.config import FunctionConfig
@@ -209,9 +208,5 @@ class LocalLambdaRunner(object):
 
         if bce_credentials.session_token != "" :
             result["token"] = bce_credentials.session_token
-
-        user_region = get_region()
-        if user_region != "" :
-            result["region"] = user_region
 
         return result

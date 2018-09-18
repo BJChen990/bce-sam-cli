@@ -145,14 +145,7 @@ class EnvironmentVariables(object):
             # Variable that says this function is running in Local CFC
             "BCE_SAM_LOCAL": "true",
 
-            # Function configuration
-            "BCE_CFC_FUNCTION_MEMORY_SIZE": str(self.memory),
-            "BCE_CFC_FUNCTION_TIMEOUT": str(self.timeout),
-
             # BCE Credentials - Use the input credentials or use the defaults
-            "BCE_REGION": self.bce_creds.get("region", self._DEFAULT_BCE_CREDS["region"]),
-
-            "BCE_DEFAULT_REGION": self.bce_creds.get("region", self._DEFAULT_BCE_CREDS["region"]),
 
             "BCE_ACCESS_KEY_ID": self.bce_creds.get("key", self._DEFAULT_BCE_CREDS["key"]),
 
