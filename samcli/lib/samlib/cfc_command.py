@@ -83,11 +83,11 @@ def _check_if_exist(cfc_client, function_name):
     try:
         get_function_response = cfc_client.get_function(function_name)
         LOG.debug("[Sample CFC] get_function response:%s", get_function_response)
-    except (BceServerError,BceHttpClientError) as e:#TODO 区分一下具体的异常,input out put 一致
+    except (BceServerError,BceHttpClientError) as e: # TODO 区分一下具体的异常，因为可能是响应超时,input out put 一致
         return False
     
-    if (get_function_response.FunctionName == None or get_function_response.FunctionName != function_name):
-        return False
+    # if (get_function_response.FunctionName == None or get_function_response.FunctionName != function_name):
+        # return False
 
     return True
 
@@ -101,7 +101,8 @@ def _create_function(cfc_client, function):
     user_runtime = _deal_with_func_runtime(function.runtime)
     user_region = get_region()
     
-    create_response = cfc_client.create_function(function_name,
+    try:
+        create_response = cfc_client.create_function(function_name,
                                                  description="cfc function from bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
@@ -110,17 +111,26 @@ def _create_function(cfc_client, function):
                                                  publish=False,
                                                  run_time=user_runtime,
                                                  timeout=user_timeout,
-                                                 dry_run=False)   
+                                                 dry_run=False)  
+    except(BceServerError,BceHttpClientError) as e:
+        if e.last_error.message == "Forbidden":
+            print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+
     LOG.debug("[Sample CFC] create_response:%s", create_response)
     print("Function Create Response : ",create_response)
 
 def _update_function(cfc_client, function):
     # update function code
     function_name = function.name
-    base64_file = _get_function_base64_file(function)
-    update_function_code_response = cfc_client.update_function_code(function_name,
+    base64_file = _get_function_base64_file(function_name)
+    try:
+        update_function_code_response = cfc_client.update_function_code(function_name,
                                                                     zip_file=base64_file,
                                                                     publish=True)
+    except(BceServerError,BceHttpClientError) as e:
+        if e.last_error.message == "Forbidden":
+            print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+
     LOG.debug("[Sample CFC] update_function_code_response:%s", update_function_code_response)
     print("Function Update Response : ",update_function_code_response)
 
@@ -160,6 +170,8 @@ def _deal_with_func_runtime(function_runtime):
         return 'python2'
     if function_runtime in ('nodejs','nodejs6','nodejs6.11'):
         return 'nodejs6.11'
+    if function_runtime in ('nodejs8','nodejs8.5'):
+        return 'nodejs8.5'
     else:
         raise UserException("Function runtime not supported")
 
