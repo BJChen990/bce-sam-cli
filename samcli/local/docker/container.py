@@ -29,8 +29,6 @@ class Container(object):
                  cmd,
                  working_dir,
                  host_dir,
-                 container_conf_dir,
-                 conf_dir,
                  memory_limit_mb=None,
                  exposed_ports=None,
                  entrypoint=None,
@@ -64,9 +62,6 @@ class Container(object):
         self._container_opts = container_opts
         self._additional_volumes = additional_volumes
 
-        self._conf_dir = conf_dir
-        self._container_conf_dir = container_conf_dir
-
         # Use the given Docker client or create new one
         self.docker_client = docker_client or docker.from_env()
 
@@ -86,7 +81,6 @@ class Container(object):
             raise RuntimeError("This container already exists. Cannot create again.")
 
         LOG.info("Mounting %s as %s:ro inside runtime container", self._host_dir, self._working_dir)
-        LOG.info("Mounting %s as %s:ro inside runtime container", self._conf_dir, self._container_conf_dir)
 
         kwargs = {
             "command": self._cmd,
@@ -96,10 +90,6 @@ class Container(object):
                     # Mount the host directory as "read only" directory inside container at working_dir
                     # https://docs.docker.com/storage/bind-mounts
                     "bind": self._working_dir,
-                    "mode": "ro"
-                },
-                self._conf_dir: {
-                    "bind": self._container_conf_dir,
                     "mode": "ro"
                 }
             },

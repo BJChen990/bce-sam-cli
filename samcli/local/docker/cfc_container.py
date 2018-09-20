@@ -32,8 +32,6 @@ class CfcContainer(Container):
 
     _WORKING_DIR = "/var/task"
 
-    _CONTAINER_CONF_DIR = "/etc/faas"
-
     # The Volume Mount path for debug files in docker
     _DEBUGGER_VOLUME_MOUNT_PATH = "/tmp/lambdaci_debug_files"
     _DEFAULT_CONTAINER_DBG_GO_PATH = _DEBUGGER_VOLUME_MOUNT_PATH + "/dlv"
@@ -45,7 +43,6 @@ class CfcContainer(Container):
                  runtime,
                  handler,
                  code_dir,
-                 conf_dir,
                  memory_mb=128,
                  env_vars=None,
                  debug_options=None):
@@ -74,8 +71,6 @@ class CfcContainer(Container):
                                               cmd,
                                               self._WORKING_DIR,
                                               code_dir,
-                                              self._CONTAINER_CONF_DIR,
-                                              conf_dir,
                                               memory_limit_mb=memory_mb,
                                               exposed_ports=ports,
                                               env_vars=env_vars,

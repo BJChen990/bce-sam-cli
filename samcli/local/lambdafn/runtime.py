@@ -66,14 +66,10 @@ class CfcRuntime(object):
         environ.add_cfc_event_body(event)
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
-        conf_dir = os.path.join(cwd, "conf")
-        self._create_conf(conf_dir, function_config)
-
         with self._get_code_dir(function_config.code_abs_path) as code_dir:
             container = CfcContainer(function_config.runtime,
                                         function_config.handler,
                                         code_dir,
-                                        conf_dir,
                                         memory_mb=function_config.memory,
                                         env_vars=env_vars,
                                         debug_options=debug_context)
@@ -177,34 +173,6 @@ class CfcRuntime(object):
         finally:
             if decompressed_dir:
                 shutil.rmtree(decompressed_dir)
-
-    def _create_conf(self, conf_dir, function_config):
-        if not os.path.exists(conf_dir):
-            os.makedirs(conf_dir)
-
-        env_conf_path = os.path.join(conf_dir, "env.conf")
-        meta_conf_path = os.path.join(conf_dir, "meta.conf")
-
-        with open(env_conf_path, 'w') as env_conf:
-            env_dict = {
-                "BCE_RUNTIME_START_TIME": "1233454646",
-	            "BCE_USER_CODE_ROOT": "/var/task",
-	            "BCE_RUNTIME_INVOKER_SOCKS": "/var/tmp/.server.sock",
-	            "BCE_RUNTIME_FUNCLET_SOCKS": "/var/tmp/funclet.sock",
-	            "BCE_RUNTIME_NAME": "test_pod"
-            }
-            json.dump(env_dict, env_conf)
-
-        with open(meta_conf_path, 'w') as meta_conf:
-            # 读函数 metadata
-            meta_dict = {
-                "FunctionName":function_config.name,
-                "MemorySize":function_config.memory,
-                "Version":"$LATEST",
-                "Handler":function_config.handler,
-                "CommitId":"12345678-7f27-43f5-ad72-f6e5d0638ce8"
-            }
-            json.dump(meta_dict, meta_conf)
 
 def _unzip_file(filepath):
     """

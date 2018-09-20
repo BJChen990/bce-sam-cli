@@ -149,7 +149,9 @@ class EnvironmentVariables(object):
 
             "BCE_ACCESS_KEY_ID": self.bce_creds.get("key", self._DEFAULT_BCE_CREDS["key"]),
 
-            "BCE_ACCESS_KEY_SECRET": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"])
+            "BCE_ACCESS_KEY_SECRET": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"]),
+
+            "_HANDLER": self.handler
 
             # Additional variables we don't fill in
             # "BCE_ACCOUNT_ID="
