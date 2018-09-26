@@ -18,7 +18,7 @@ SUPPORTED_RUNTIME = [r for r in RUNTIME_TEMPLATE_MAPPING]
 @click.command(context_settings=dict(help_option_names=[u'-h', u'--help']))
 @click.option('-l', '--location', help="Template location (git, mercurial, http(s), zip, path)")
 @click.option('-r', '--runtime', type=click.Choice(SUPPORTED_RUNTIME), default="nodejs8.5",
-              help="Lambda Runtime of your app")
+              help="CFC Runtime of your app")
 @click.option('-o', '--output-dir', default='.', type=click.Path(), help="Where to output the initialized app into")
 @click.option('-n', '--name', default="sam-app", help="Name of your project to be generated as a folder")
 @click.option('--no-input', is_flag=True, default=False,
@@ -28,8 +28,8 @@ SUPPORTED_RUNTIME = [r for r in RUNTIME_TEMPLATE_MAPPING]
 def cli(ctx, location, runtime, output_dir, name, no_input):
     """ \b
         Initialize a serverless application with a SAM template, folder
-        structure for your Lambda functions, connected to an event source such as APIs,
-        S3 Buckets or DynamoDB Tables. This application includes everything you need to
+        structure for your CFC functions, connected to an event source such as APIs,
+        BOS Buckets or DuerOs. This application includes everything you need to
         get started with serverless and eventually grow into a production scale application.
         \b
         This command can initialize a boilerplate serverless app. If you want to create your own

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import logging
 import platform
 import subprocess
@@ -6,6 +8,7 @@ import time
 import base64
 import os
 import zipfile
+import json
 
 from baidubce.services.cfc.cfc_client import CfcClient
 from baidubce.exception import BceServerError
@@ -112,12 +115,15 @@ def _create_function(cfc_client, function):
                                                  run_time=user_runtime,
                                                  timeout=user_timeout,
                                                  dry_run=False)  
+        LOG.debug("[Sample CFC] create_response:%s", create_response)
+        print("Function Create Response : " + str(create_response))
+
     except(BceServerError,BceHttpClientError) as e:
         if e.last_error.message == "Forbidden":
             print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+        else:
+            raise UserException(str(e))  
 
-    LOG.debug("[Sample CFC] create_response:%s", create_response)
-    print("Function Create Response : ",create_response)
 
 def _update_function(cfc_client, function):
     # update function code
@@ -127,12 +133,15 @@ def _update_function(cfc_client, function):
         update_function_code_response = cfc_client.update_function_code(function_name,
                                                                     zip_file=base64_file,
                                                                     publish=True)
+        LOG.debug("[Sample CFC] update_function_code_response:%s", update_function_code_response)
+        print("Function Update Response : " + str(update_function_code_response))
+
     except(BceServerError,BceHttpClientError) as e:
         if e.last_error.message == "Forbidden":
             print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+        else:
+            raise UserException(str(e))
 
-    LOG.debug("[Sample CFC] update_function_code_response:%s", update_function_code_response)
-    print("Function Update Response : ",update_function_code_response)
 
 def _get_function_base64_file(function_name):
     zipfile_name = function_name + '.zip'
