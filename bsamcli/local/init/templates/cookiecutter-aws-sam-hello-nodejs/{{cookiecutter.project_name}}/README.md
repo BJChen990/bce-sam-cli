@@ -11,7 +11,7 @@ This is a sample template for {{ cookiecutter.project_name }} - Below is a brief
 │   └── tests                   <-- Unit tests
 │       └── unit
 │           └── test_handler.js
-└── template.yaml               <-- SAM template
+└── template.yaml               <-- BCE SAM template
 ```
 
 ## Requirements
@@ -38,74 +38,32 @@ npm install
 cd ../
 ```
 
-### Local development
-
-**Invoking function locally through local API Gateway**
-
-```bash
-sam local start-api
-```
-
-If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
-
-**SAM CLI** is used to emulate both CFC and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
-
-```yaml
-...
-Events:
-    HelloWorld:
-        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-        Properties:
-            Path: /hello
-            Method: get
-```
+**BSAM CLI** is used to emulate CFC locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.)
 
 ## Packaging and deployment
 
-BCE CFC NodeJS runtime requires a flat folder with all dependencies including the application. SAM will use `CodeUri` property to know where to look up for both application and dependencies:
+BCE CFC Python runtime requires a flat folder with all dependencies including the application. BSAM will use `CodeUri` property to know where to look up for both application and dependencies:
 
 ```yaml
 ...
-    FirstFunction:
+    HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
             CodeUri: hello_world/
             ...
 ```
 
-Firstly, we need a `S3 bucket` where we can upload our CFC functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
+Next, run the following command to package function to a local zip file:
 
 ```bash
-aws s3 mb s3://BUCKET_NAME
+bsam package
 ```
 
-Next, run the following command to package our CFC function to S3:
+Next, the following command will use CFC api to create or update function.
 
 ```bash
-sam package \
-    --template-file template.yaml \
-    --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
+bsam deploy
 ```
-
-Next, the following command will create a Cloudformation Stack and deploy your SAM resources.
-
-```bash
-sam deploy \
-    --template-file packaged.yaml \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --capabilities CAPABILITY_IAM
-```
-
-> **See [Serverless Application Model (SAM) HOWTO Guide](https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md) for more details in how to get started.**
-
-After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:
-
-```bash
-aws cloudformation describe-stacks \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --query 'Stacks[].Outputs'
-``` 
 
 ## Testing
 
@@ -115,39 +73,3 @@ We use `mocha` for testing our code and it is already added in `package.json` un
 cd hello_world
 npm run test
 ```
-
-# Appendix
-
-## BCE CLI commands
-
-BCE CLI commands to package, deploy and describe outputs defined within the cloudformation stack:
-
-```bash
-sam package \
-    --template-file template.yaml \
-    --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
-
-sam deploy \
-    --template-file packaged.yaml \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} \
-    --capabilities CAPABILITY_IAM \
-    --parameter-overrides MyParameterSample=MySampleValue
-
-aws cloudformation describe-stacks \
-    --stack-name {{ cookiecutter.project_name.lower().replace(' ', '-') }} --query 'Stacks[].Outputs'
-```
-
-**NOTE**: Alternatively this could be part of package.json scripts section.
-
-## Bringing to the next level
-
-Here are a few ideas that you can use to get more acquainted as to how this overall process works:
-
-* Create an additional API resource (e.g. /hello/{proxy+}) and return the name requested through this new path
-* Update unit test to capture that
-* Package & Deploy
-
-Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
-
-* [BCE Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)

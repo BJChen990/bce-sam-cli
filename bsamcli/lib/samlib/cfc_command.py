@@ -109,6 +109,7 @@ def _create_function(cfc_client, function):
                                                  description="cfc function from bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
+                                                 environment=function.environment.get("Variables", None),
                                                  region=user_region,
                                                  zip_file=base64_file,
                                                  publish=False,
