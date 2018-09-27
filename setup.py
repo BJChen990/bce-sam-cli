@@ -24,14 +24,14 @@ def read_requirements(req='base.txt'):
 
 def read_version():
     content = read(os.path.join(
-        os.path.dirname(__file__), 'samcli', '__init__.py'))
+        os.path.dirname(__file__), 'bsamcli', '__init__.py'))
     return re.search(r"__version__ = '([^']+)'", content).group(1)
 
 
-cmd_name = "sam"
-if os.getenv("SAM_CLI_DEV"):
+cmd_name = "bsam"
+if os.getenv("BSAM_CLI_DEV"):
     # We are installing in a dev environment
-    cmd_name = "samdev"
+    cmd_name = "bsamdev"
 
 setup(
     name='bce-sam-cli',
@@ -48,7 +48,7 @@ setup(
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
     entry_points={
         'console_scripts': [
-            '{}=samcli.cli.main:cli'.format(cmd_name)
+            '{}=bsamcli.cli.main:cli'.format(cmd_name)
         ]
     },
     install_requires=read_requirements('base.txt'),
