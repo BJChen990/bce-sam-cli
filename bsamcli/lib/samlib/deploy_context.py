@@ -7,6 +7,8 @@ from bsamcli.yamlhelper import yaml_parse
 from user_exceptions import DeployContextException
 from bsamcli.local.lambdafn.exceptions import FunctionNotFound
 from bsamcli.commands.local.lib.sam_function_provider import SamFunctionProvider
+from bsamcli.commands.local.lib.sam_bos_provider import SamBosProvider
+from bsamcli.commands.local.lib.sam_dueros_provider import SamDuerosProvider
 
 # This is an attempt to do a controlled import. pathlib is in the
 # Python standard library starting at 3.4. This will import pathlib2,
@@ -35,10 +37,17 @@ class DeployContext(object):
         self._env_vars_value = None
         self._log_file_handle = None
 
+        self._event_source_provider = None
+
     def __enter__(self):
         # Grab template from file and create a provider
         self._template_dict = self._get_template_data(self._template_file)
         self._function_provider = SamFunctionProvider(self._template_dict)
+
+        self._event_source_provider = [
+            SamBosProvider(self._template_dict),
+            SamDuerosProvider(self._template_dict)
+        ]
 
         self._env_vars_value = self._get_env_vars_value(self._env_vars_file)
         self._log_file_handle = self._setup_log_file(self._log_file)
@@ -60,6 +69,10 @@ class DeployContext(object):
         if len(all_functions) == 0:
             raise FunctionNotFound("Unable to find a single Function in the template file")
         return all_functions
+
+    def deploy(self, cfc_client, func_config):
+        for p in self._event_source_provider:            
+            p.deploy(cfc_client, func_config)
 
     @property
     def function_name(self):

@@ -11,6 +11,7 @@ import zipfile
 import json
 
 from baidubce.services.cfc.cfc_client import CfcClient
+from baidubce.services.bos.bos_client import BosClient
 from baidubce.exception import BceServerError
 from baidubce.exception import BceHttpClientError
 import cfc_deploy_conf
@@ -63,8 +64,8 @@ def execute_deploy_command(command):
                            env_vars_file=None,
                            log_file=None,
                            ) as context:
-            for f in context.all_functions:
-                _do_deploy(f)
+            for f in context.all_functions:                                
+                _do_deploy(context, f)
 
     except FunctionNotFound:
         raise UserException("Function not found in template")
@@ -72,7 +73,11 @@ def execute_deploy_command(command):
         raise UserException(str(ex))   
 
 
-def _do_deploy(function):
+# 部署一个function
+# 以及函数的触发器
+# function结构体加上events列表，对每个events调用addRelation接口，出错抛出异常.
+
+def _do_deploy(context, function):
     # create a cfc client
     cfc_client = CfcClient(cfc_deploy_conf.get_config())
     existed = _check_if_exist(cfc_client, function.name)
@@ -80,6 +85,12 @@ def _do_deploy(function):
         _update_function(cfc_client, function)
     else:
         _create_function(cfc_client, function)
+        _create_event_source(cfc_client, function, context)
+        # create relation
+        # for xx in supported_trigger_list:
+        #   xx.do_deploy_trigger()
+        # 
+    LOG.info("deploy done.")  
 
 
 def _check_if_exist(cfc_client, function_name):
@@ -183,3 +194,13 @@ def _deal_with_func_runtime(function_runtime):
     else:
         raise UserException("Function runtime not supported")
 
+
+def _create_event_source(cfc_client, function, context):    
+    func_config = cfc_client.get_function_configuration(function.name)
+    LOG.debug("get function ret is: %s", func_config)
+    
+    try:
+        context.deploy(cfc_client, func_config)
+    except(BceServerError, BceHttpClientError) as e:
+        raise UserException(str(e))
+    

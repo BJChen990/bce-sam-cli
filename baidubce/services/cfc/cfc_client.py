@@ -639,6 +639,22 @@ class CfcClient(bce_base_client.BceBaseClient):
             params={},
             config=config)
 
+    def create_event_source(self, target, source, data=None, config=None):
+        body = {
+            "Target": target,
+            "Source": source            
+        }
+        if data is not None:
+            body["Data"] = data
+
+        return self._send_request(
+            http_methods.POST,
+            '/console/relation',
+            body=json.dumps(body),
+            params={},
+            config=config
+        )
+
     @staticmethod
     def _merge_config(self, config):
         if config is None:

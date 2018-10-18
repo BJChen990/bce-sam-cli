@@ -103,3 +103,39 @@ class ApiProvider(object):
         :yields Api: namedtuple containing the API information
         """
         raise NotImplementedError("not implemented")
+
+BosEvent = namedtuple("BosEvent", [
+
+    # String. Path that this API serves. Ex: /foo, /bar/baz
+    "bucket",
+
+    # String List. HTTP Method this API responds with
+    "event_types",
+
+    # String
+    "prefix",
+
+    # String
+    "suffix",
+
+    # String
+    "function_name",
+])
+
+DuerosEvent = namedtuple("DuerosEvent", [
+    # String
+    "function_name",
+])
+
+class EventSourceProvider(object):
+    def get(self, name):
+        """
+        Given name of the function, this method must return the Function object
+
+        :param string name: Name of the function
+        :return Function: namedtuple containing the Function information
+        """
+        raise NotImplementedError("not implemented")
+    
+    def deploy(self, cfc_client, func_config):
+        raise NotImplementedError("not implemented")
