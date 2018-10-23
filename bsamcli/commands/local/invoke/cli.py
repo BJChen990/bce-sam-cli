@@ -40,17 +40,17 @@ STDIN_FILE_NAME = "-"
 @cli_framework_options
 @click.argument('function_identifier', required=False)
 @pass_context
-def cli(ctx, function_identifier, template, event, no_event, env_vars, 
-        docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
+def cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
 
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
-    do_cli(ctx, function_identifier, template, event, no_event, env_vars, 
-           docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
+    do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
 
 
-def do_cli(ctx, function_identifier, template, event, no_event, env_vars,  # pylint: disable=R0914
-           docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
+def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
     """
     Implementation of the ``cli`` method, just separated out for unit testing purposes
     """
@@ -77,6 +77,8 @@ def do_cli(ctx, function_identifier, template, event, no_event, env_vars,  # pyl
                            log_file=log_file,
                            skip_pull_image=skip_pull_image,
                            aws_profile=profile,
+                           debug_port=debug_port,
+                           debug_args=debug_args,                           
                            aws_region=region) as context:
 
             # Invoke the function

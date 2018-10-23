@@ -4,7 +4,9 @@ Represents Cfc runtime containers.
 from enum import Enum
 
 from .container import Container
+import logging
 
+LOG = logging.getLogger(__name__)
 
 class Runtime(Enum):
     nodejs85 = "nodejs8.5"
@@ -63,6 +65,7 @@ class CfcContainer(Container):
 
         image = CfcContainer._get_image(runtime)
         ports = CfcContainer._get_exposed_ports(debug_options)
+        entry = CfcContainer._get_entry_point(runtime, debug_options)
         additional_options = CfcContainer._get_additional_options(runtime, debug_options)
         additional_volumes = CfcContainer._get_additional_volumes(debug_options)
         cmd = [handler]
@@ -73,6 +76,7 @@ class CfcContainer(Container):
                                               code_dir,
                                               memory_limit_mb=memory_mb,
                                               exposed_ports=ports,
+                                              entrypoint=entry,
                                               env_vars=env_vars,
                                               container_opts=additional_options,
                                               additional_volumes=additional_volumes)
@@ -108,11 +112,11 @@ class CfcContainer(Container):
 
         opts = {}
 
-        if runtime == Runtime.go1x.value:
-            # These options are required for delve to function properly inside a docker container on docker < 1.12
-            # See https://github.com/moby/moby/issues/21051
-            opts["security_opt"] = ["seccomp:unconfined"]
-            opts["cap_add"] = ["SYS_PTRACE"]
+        # if runtime == Runtime.go1x.value:
+        #     # These options are required for delve to function properly inside a docker container on docker < 1.12
+        #     # See https://github.com/moby/moby/issues/21051
+        #     opts["security_opt"] = ["seccomp:unconfined"]
+        #     opts["cap_add"] = ["SYS_PTRACE"]
 
         return opts
 
@@ -167,7 +171,17 @@ class CfcContainer(Container):
         # configs from: https://github.com/lambci/docker-lambda
         # to which we add the extra debug mode options
         entrypoint = None
-        if runtime == Runtime.java8.value:
+        if runtime == Runtime.nodejs85.value:
+
+            entrypoint = ["/var/runtime/bin/start_invoke.sh"] \
+                            + [str(debug_port)] \
+                            + debug_args_list
+        
+        elif runtime == Runtime.python27.value:
+            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + debug_args_list
+
+        
+        elif runtime == Runtime.java8.value:
 
             entrypoint = ["/usr/bin/java"] \
                    + debug_args_list \
@@ -233,29 +247,6 @@ class CfcContainer(Container):
                        "--max-executable-size=160",
                        "--expose-gc",
                        "/var/runtime/node_modules/awslambda/index.js",
-                   ]
-
-        elif runtime == Runtime.nodejs810.value:
-
-            entrypoint = ["/var/lang/bin/node"] \
-                    + debug_args_list \
-                    + [
-                        # Node8 requires the host to be explicitly set in order to bind to localhost
-                        # instead of 127.0.0.1. https://github.com/nodejs/node/issues/11591#issuecomment-283110138
-                        "--inspect-brk=0.0.0.0:" + str(debug_port),
-                        "--nolazy",
-                        "--expose-gc",
-                        "--max-semi-space-size=150",
-                        "--max-old-space-size=2707",
-                        "/var/runtime/node_modules/awslambda/index.js",
-                    ]
-
-        elif runtime == Runtime.python27.value:
-
-            entrypoint = ["/usr/bin/python2.7"] \
-                   + debug_args_list \
-                   + [
-                       "/var/runtime/awslambda/bootstrap.py"
                    ]
 
         elif runtime == Runtime.python36.value:
