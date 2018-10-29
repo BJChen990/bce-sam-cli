@@ -134,6 +134,11 @@ def invoke_common_options(f):
                      is_flag=True,
                      help="Specify whether CLI should skip pulling down the latest Docker image for CFC runtime.",
                      envvar="SAM_SKIP_PULL_IMAGE"),
+        
+        click.option('--skip-check-dependency',
+                     is_flag=True,
+                     help="Specify whether CLI should skip check dependent files for your function.",
+                     envvar="SAM_SKIP_CHECK_DEPENDENCY"),
 
         click.option('--profile',
                      help="Specify which BCE credentials profile to use."),

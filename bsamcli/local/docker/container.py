@@ -80,7 +80,7 @@ class Container(object):
         if self.is_created():
             raise RuntimeError("This container already exists. Cannot create again.")
 
-        LOG.info("Mounting %s as %s:ro inside runtime container", self._host_dir, self._working_dir)
+        LOG.info("Mounting %s as %s:rw inside runtime container", self._host_dir, self._working_dir)
 
         kwargs = {
             "command": self._cmd,
@@ -90,7 +90,7 @@ class Container(object):
                     # Mount the host directory as "read only" directory inside container at working_dir
                     # https://docs.docker.com/storage/bind-mounts
                     "bind": self._working_dir,
-                    "mode": "ro"
+                    "mode": "rw"
                 }
             },
             # We are not running an interactive shell here.

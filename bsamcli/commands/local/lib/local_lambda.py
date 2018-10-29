@@ -30,7 +30,8 @@ class LocalLambdaRunner(object):
                  env_vars_values=None,
                  aws_profile=None,
                  debug_context=None,
-                 aws_region=None):
+                 aws_region=None,
+                 skip_check_dependency=False):
         """
         Initializes the class
 
@@ -52,6 +53,7 @@ class LocalLambdaRunner(object):
         self.aws_profile = aws_profile
         self.aws_region = aws_region
         self.debug_context = debug_context
+        self.skip_check_dependency = skip_check_dependency
 
     def invoke(self, function_name, event, stdout=None, stderr=None):
         """
@@ -161,7 +163,8 @@ class LocalLambdaRunner(object):
                                     variables=variables,
                                     shell_env_values=shell_env,
                                     override_values=overrides,
-                                    bce_creds=creds)
+                                    bce_creds=creds,
+                                    skip_check_dependency=self.skip_check_dependency)
 
     def _get_code_path(self, codeuri):
         """

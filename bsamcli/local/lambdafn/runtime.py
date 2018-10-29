@@ -135,12 +135,12 @@ class CfcRuntime(object):
         if is_debugging:
             LOG.debug("Setting up SIGTERM interrupt handler")
             signal.signal(signal.SIGTERM, signal_handler)
-        else:
-            # Start a timer, we'll use this to abort the function if it runs beyond the specified timeout
-            LOG.debug("Starting a timer for %s seconds for function '%s'", timeout, function_name)
-            timer = threading.Timer(timeout, timer_handler, ())
-            timer.start()
-            return timer
+        # else:
+        #     # Start a timer, we'll use this to abort the function if it runs beyond the specified timeout
+        #     LOG.debug("Starting a timer for %s seconds for function '%s'", timeout, function_name)
+        #     timer = threading.Timer(timeout, timer_handler, ())
+        #     timer.start()
+        #     return timer
 
     @contextmanager
     def _get_code_dir(self, code_path):
