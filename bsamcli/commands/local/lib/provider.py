@@ -127,6 +127,21 @@ DuerosEvent = namedtuple("DuerosEvent", [
     "function_name",
 ])
 
+HttpEvent = namedtuple("HttpEvent", [
+    # String
+    "function_name",
+    
+    # String
+    "resource_path",
+
+    # String
+    "method",
+
+    # String
+    "auth_type"
+])
+
+
 class EventSourceProvider(object):
     def get(self, name):
         """

@@ -9,6 +9,7 @@ from bsamcli.local.lambdafn.exceptions import FunctionNotFound
 from bsamcli.commands.local.lib.sam_function_provider import SamFunctionProvider
 from bsamcli.commands.local.lib.sam_bos_provider import SamBosProvider
 from bsamcli.commands.local.lib.sam_dueros_provider import SamDuerosProvider
+from bsamcli.commands.local.lib.sam_http_provider import SamHttpProvider
 
 # This is an attempt to do a controlled import. pathlib is in the
 # Python standard library starting at 3.4. This will import pathlib2,
@@ -46,7 +47,8 @@ class DeployContext(object):
 
         self._event_source_provider = [
             SamBosProvider(self._template_dict),
-            SamDuerosProvider(self._template_dict)
+            SamDuerosProvider(self._template_dict),
+            SamHttpProvider(self._template_dict),
         ]
 
         self._env_vars_value = self._get_env_vars_value(self._env_vars_file)
