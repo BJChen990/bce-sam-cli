@@ -5,11 +5,6 @@ Description: >
 
     Sample SAM Template for {{ cookiecutter.project_name }}
 
-# More info about Globals: https://github.com/bcelabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-    Function:
-        Timeout: 3
-
 
 Resources:
 
