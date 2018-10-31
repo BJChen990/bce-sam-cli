@@ -42,7 +42,6 @@ class EnvironmentVariables(object):
                  function_timeout=None,
                  function_handler=None,
                  variables=None,
-                 skip_check_dependency=False,
                  shell_env_values=None,
                  override_values=None,
                  bce_creds=None):
@@ -73,8 +72,7 @@ class EnvironmentVariables(object):
         self.variables = variables or {}
         self.shell_env_values = shell_env_values or {}
         self.override_values = override_values or {}
-        self.bce_creds = bce_creds or {}
-        self.skip_check_dependency = skip_check_dependency
+        self.bce_creds = bce_creds or {}        
 
     def resolve(self):
         """
@@ -110,6 +108,9 @@ class EnvironmentVariables(object):
         Adds the value of BCE_CFC_EVENT_BODY environment variable.
         """
         self.variables["BCE_EVENT_BODY"] = value
+
+    def add_install_flag(self):
+        self.variables["IS_INSTALLING"] = "True"
 
     @property
     def timeout(self):
@@ -154,8 +155,7 @@ class EnvironmentVariables(object):
             "BCE_ACCESS_KEY_SECRET": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"]),
 
             "_HANDLER": self.handler,
-            "_TIMEOUT": self.timeout,
-            "_SKIP_CHECK_DEPENDENCY": self.skip_check_dependency[0] # why skip_check_dependency is a tuple
+            "_TIMEOUT": self.timeout,            
 
             # Additional variables we don't fill in
             # "BCE_ACCOUNT_ID="

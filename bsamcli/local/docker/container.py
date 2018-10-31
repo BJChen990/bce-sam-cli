@@ -80,7 +80,7 @@ class Container(object):
         if self.is_created():
             raise RuntimeError("This container already exists. Cannot create again.")
 
-        LOG.info("Mounting %s as %s:rw inside runtime container", self._host_dir, self._working_dir)
+        LOG.info("Mounting %s as %s inside runtime container", self._host_dir, self._working_dir)
 
         kwargs = {
             "command": self._cmd,

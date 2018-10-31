@@ -31,7 +31,7 @@ class LocalLambdaRunner(object):
                  aws_profile=None,
                  debug_context=None,
                  aws_region=None,
-                 skip_check_dependency=False):
+                 is_installing=None):
         """
         Initializes the class
 
@@ -52,10 +52,9 @@ class LocalLambdaRunner(object):
         self.env_vars_values = env_vars_values or {}
         self.aws_profile = aws_profile
         self.aws_region = aws_region
-        self.debug_context = debug_context
-        self.skip_check_dependency = skip_check_dependency
+        self.debug_context = debug_context        
 
-    def invoke(self, function_name, event, stdout=None, stderr=None):
+    def invoke(self, function_name, event, is_installing=None, stdout=None, stderr=None):
         """
         Find the Lambda function with given name and invoke it. Pass the given event to the function and return
         response through the given streams.
@@ -77,11 +76,12 @@ class LocalLambdaRunner(object):
 
         LOG.debug("Found one Lambda function with name '%s'", function_name)
 
-        LOG.info("Invoking %s (%s)", function.handler, function.runtime)
+        if not is_installing:
+            LOG.info("Invoking %s (%s)", function.handler, function.runtime)
         config = self._get_invoke_config(function)
 
         # Invoke the function
-        self.local_runtime.invoke(config, self.cwd, event, debug_context=self.debug_context, stdout=stdout, stderr=stderr)
+        self.local_runtime.invoke(config, self.cwd, event, debug_context=self.debug_context, is_installing=is_installing, stdout=stdout, stderr=stderr)
 
     def is_debugging(self):
         """
@@ -163,8 +163,7 @@ class LocalLambdaRunner(object):
                                     variables=variables,
                                     shell_env_values=shell_env,
                                     override_values=overrides,
-                                    bce_creds=creds,
-                                    skip_check_dependency=self.skip_check_dependency)
+                                    bce_creds=creds)
 
     def _get_code_path(self, codeuri):
         """

@@ -40,6 +40,7 @@ class CfcRuntime(object):
                cwd,
                event,
                debug_context=None,
+               is_installing=None,
                stdout=None,
                stderr=None):
         """
@@ -64,6 +65,8 @@ class CfcRuntime(object):
         # Update with event input
         environ = function_config.env_vars
         environ.add_cfc_event_body(event)
+        if is_installing:
+            environ.add_install_flag()
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
         with self._get_code_dir(function_config.code_abs_path) as code_dir:
@@ -77,7 +80,7 @@ class CfcRuntime(object):
             try:
 
                 # Start the container. This call returns immediately after the container starts
-                self._container_manager.run(container)
+                self._container_manager.run(container, is_installing)
 
                 # Setup appropriate interrupt - timeout or Ctrl+C - before function starts executing.
                 #
@@ -87,7 +90,8 @@ class CfcRuntime(object):
                 timer = self._configure_interrupt(function_config.name,
                                                   function_config.timeout,
                                                   container,
-                                                  bool(debug_context))
+                                                  bool(debug_context),
+                                                  is_installing)
 
                 # NOTE: BLOCKING METHOD
                 # Block the thread waiting to fetch logs from the container. This method will return after container
@@ -109,7 +113,7 @@ class CfcRuntime(object):
                     timer.cancel()
                 self._container_manager.stop(container)
 
-    def _configure_interrupt(self, function_name, timeout, container, is_debugging):
+    def _configure_interrupt(self, function_name, timeout, container, is_debugging, is_installing):
         """
         When a CFC function is executing, we setup certain interrupt handlers to stop the execution.
         Usually, we setup a function timeout interrupt to kill the container after timeout expires. If debugging though,
@@ -132,15 +136,15 @@ class CfcRuntime(object):
             LOG.info("Execution of function %s was interrupted", function_name)
             self._container_manager.stop(container)
 
-        if is_debugging:
+        if is_debugging or is_installing:
             LOG.debug("Setting up SIGTERM interrupt handler")
             signal.signal(signal.SIGTERM, signal_handler)
-        # else:
-        #     # Start a timer, we'll use this to abort the function if it runs beyond the specified timeout
-        #     LOG.debug("Starting a timer for %s seconds for function '%s'", timeout, function_name)
-        #     timer = threading.Timer(timeout, timer_handler, ())
-        #     timer.start()
-        #     return timer
+        else:
+            # Start a timer, we'll use this to abort the function if it runs beyond the specified timeout
+            LOG.debug("Starting a timer for %s seconds for function '%s'", timeout, function_name)
+            timer = threading.Timer(timeout, timer_handler, ())
+            timer.start()
+            return timer
 
     @contextmanager
     def _get_code_dir(self, code_path):

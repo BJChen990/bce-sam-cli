@@ -41,16 +41,16 @@ STDIN_FILE_NAME = "-"
 @click.argument('function_identifier', required=False)
 @pass_context
 def cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
-        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, skip_check_dependency, profile, region):
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
 
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
     do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
-        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, skip_check_dependency, profile, region)  # pragma: no cover
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
 
 
 def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
-        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, skip_check_dependency, profile, region):
+        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
     """
     Implementation of the ``cli`` method, just separated out for unit testing purposes
     """
@@ -75,8 +75,7 @@ def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_
                            docker_volume_basedir=docker_volume_basedir,
                            docker_network=docker_network,
                            log_file=log_file,
-                           skip_pull_image=skip_pull_image,
-                           skip_check_dependency=skip_check_dependency, 
+                           skip_pull_image=skip_pull_image,                           
                            aws_profile=profile,
                            debug_port=debug_port,
                            debug_args=debug_args,                           

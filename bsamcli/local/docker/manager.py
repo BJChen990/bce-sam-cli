@@ -32,7 +32,7 @@ class ContainerManager(object):
         self.docker_network_id = docker_network_id
         self.docker_client = docker_client or docker.from_env()
 
-    def run(self, container, input_data=None, warm=False):
+    def run(self, container, is_installing=None, input_data=None, warm=False):
         """
         Create and run a Docker container based on the given configuration.
 
@@ -52,7 +52,8 @@ class ContainerManager(object):
         if not self.has_image(image_name) or not self.skip_pull_image:
             self.pull_image(image_name)
         else:
-            LOG.info("Requested to skip pulling images ...\n")
+            if not is_installing:
+                LOG.info("Requested to skip pulling images ...\n")
 
         if not container.is_created():
             # Create the container first before running.

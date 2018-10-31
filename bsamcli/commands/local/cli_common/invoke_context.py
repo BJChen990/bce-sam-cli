@@ -52,7 +52,6 @@ class InvokeContext(object):
                  docker_network=None,
                  log_file=None,
                  skip_pull_image=None,
-                 skip_check_dependency=None,
                  aws_profile=None,
                  debug_port=None,
                  debug_args=None,
@@ -77,9 +76,7 @@ class InvokeContext(object):
             Path to a file to send container output to. If the file does not exist, it will be
             created
         skip_pull_image bool
-            Should we skip pulling the Docker container image?
-        skip_check_dependency bool
-            Should we skip checking dependency for function?    
+            Should we skip pulling the Docker container image?        
         aws_profile str
             Name of the profile to fetch AWS credentials from
         debug_port int
@@ -96,7 +93,6 @@ class InvokeContext(object):
         self._docker_network = docker_network
         self._log_file = log_file
         self._skip_pull_image = skip_pull_image
-        self._skip_check_dependency = skip_check_dependency,
         self._aws_profile = aws_profile
         self._aws_region = aws_region
         self._debug_port = debug_port
@@ -185,8 +181,7 @@ class InvokeContext(object):
                                  env_vars_values=self._env_vars_value,
                                  debug_context=self._debug_context,
                                  aws_profile=self._aws_profile,
-                                 aws_region=self._aws_region,
-                                 skip_check_dependency=self._skip_check_dependency)
+                                 aws_region=self._aws_region)
 
     @property
     def stdout(self):
