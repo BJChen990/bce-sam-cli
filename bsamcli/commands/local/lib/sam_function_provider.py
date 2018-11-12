@@ -127,6 +127,7 @@ class SamFunctionProvider(FunctionProvider):
             memory=resource_properties.get("MemorySize"),
             timeout=resource_properties.get("Timeout"),
             handler=resource_properties.get("Handler"),
+            description=resource_properties.get("Description"),
             codeuri=codeuri,
             environment=resource_properties.get("Environment"),
             rolearn=resource_properties.get("Role")

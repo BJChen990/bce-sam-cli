@@ -22,6 +22,9 @@ Function = namedtuple("Function", [
     # Name of the handler
     "handler",
 
+    # Description of the function
+    "description",
+
     # Path to the code. This could be a S3 URI or local path or a dictionary of S3 Bucket, Key, Version
     "codeuri",
 

@@ -27,19 +27,6 @@ from user_exceptions import DeployContextException
 LOG = logging.getLogger(__name__)
 _TEMPLATE_OPTION_DEFAULT_VALUE = "template.yaml"
 
-
-def execute_pkg_command_backup(command, args):
-    LOG.debug("%s command is called", command)
-    try:
-        pkg_cmd = 'zip' if platform.system().lower() != 'windows' else 'rar'       
-        cmd_option = "-r" if platform.system().lower() != 'windows' else 'r'
-        subprocess.check_call([pkg_cmd, cmd_option, ] + list(args))
-        LOG.debug("%s command successful", command)
-    except subprocess.CalledProcessError as e:
-        LOG.debug("Exception: %s", e)
-        sys.exit(e.returncode)
-
-
 def execute_pkg_command(command):
     LOG.debug("%s command is called", command)
     try:
@@ -48,15 +35,15 @@ def execute_pkg_command(command):
                            env_vars_file=None,
                            log_file=None,
                            ) as context:
-            for f in context.all_functions:
+            for f in context.all_functions:                
                 _zip_up(f.codeuri, f.name)
     except FunctionNotFound:
         raise UserException("Function not found in template")
     except InvalidSamDocumentException as ex:
-        raise UserException(str(ex))   
+        raise UserException(str(ex))
 
 
-def execute_deploy_command(command):
+def execute_deploy_command(command, region=None):
     LOG.debug("%s command is called", command)
     try:
         with DeployContext(template_file=_TEMPLATE_OPTION_DEFAULT_VALUE,
@@ -65,31 +52,22 @@ def execute_deploy_command(command):
                            log_file=None,
                            ) as context:
             for f in context.all_functions:                                
-                _do_deploy(context, f)
+                _do_deploy(context, f, region)
 
     except FunctionNotFound:
         raise UserException("Function not found in template")
     except InvalidSamDocumentException as ex:
-        raise UserException(str(ex))   
+        raise UserException(str(ex))
 
-
-# 部署一个function
-# 以及函数的触发器
-# function结构体加上events列表，对每个events调用addRelation接口，出错抛出异常.
-
-def _do_deploy(context, function):
+def _do_deploy(context, function, region):
     # create a cfc client
-    cfc_client = CfcClient(cfc_deploy_conf.get_config())
+    cfc_client = CfcClient(cfc_deploy_conf.get_config(region))
     existed = _check_if_exist(cfc_client, function.name)
     if existed:
         _update_function(cfc_client, function)
     else:
         _create_function(cfc_client, function)
         _create_event_source(cfc_client, function, context)
-        # create relation
-        # for xx in supported_trigger_list:
-        #   xx.do_deploy_trigger()
-        # 
     LOG.info("deploy done.")  
 
 
@@ -110,14 +88,14 @@ def _create_function(cfc_client, function):
     # create a cfc function
     function_name = function.name
     base64_file = _get_function_base64_file(function_name)
-    user_memorysize = function.memory if function.memory != None else 128
-    user_timeout = function.timeout if function.timeout != None else 3
+    user_memorysize = function.memory or 128
+    user_timeout = function.timeout or 3
     user_runtime = _deal_with_func_runtime(function.runtime)
     user_region = get_region()
     
     try:
         create_response = cfc_client.create_function(function_name,
-                                                 description="cfc function from bsam cli",
+                                                 description=function.description or "cfc function from bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
                                                  environment=function.environment.get("Variables", None),
@@ -128,29 +106,38 @@ def _create_function(cfc_client, function):
                                                  timeout=user_timeout,
                                                  dry_run=False)  
         LOG.debug("[Sample CFC] create_response:%s", create_response)
-        print("Function Create Response : " + str(create_response))
+        LOG.info("Function Create Response: %s", str(create_response))
 
     except(BceServerError,BceHttpClientError) as e:
         if e.last_error.message == "Forbidden":
-            print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+            LOG.info("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
         else:
             raise UserException(str(e))  
 
 
 def _update_function(cfc_client, function):
-    # update function code
+    # update function code and configuration
     function_name = function.name
     base64_file = _get_function_base64_file(function_name)
     try:
-        update_function_code_response = cfc_client.update_function_code(function_name,
+        update_function_code_response = cfc_client.update_function_code(function.name,
                                                                     zip_file=base64_file,
-                                                                    publish=True)
-        LOG.debug("[Sample CFC] update_function_code_response:%s", update_function_code_response)
-        print("Function Update Response : " + str(update_function_code_response))
+                                                                    publish=True)        
+        LOG.info("Function Update Response: %s\n", str(update_function_code_response))
+
+        update_func_config_response = cfc_client.update_function_configuration(function.name,
+                                            environment=function.environment.get("Variables", None),
+                                            handler=function.handler,
+                                            run_time=_deal_with_func_runtime(function.runtime),
+                                            timeout=function.timeout,
+                                            description=function.description)
+
+        LOG.info("Function Configuration Update Response: %s", str(update_func_config_response))
+
 
     except(BceServerError,BceHttpClientError) as e:
         if e.last_error.message == "Forbidden":
-            print("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
+            LOG.info("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
         else:
             raise UserException(str(e))
 
@@ -167,30 +154,32 @@ def _get_function_base64_file(function_name):
             raise DeployContextException("Failed to convert zipfile to base64: {}".format(str(ex)))
 
 
-def _zip_up(startdir, file_news=None):
-    if startdir == None:
-        raise DeployContextException("Missing the file or the directory to zip up : {} is not valid".format(startdir))
-
-    if file_news == None:
-        file_news = startdir +'.zip' # 压缩后文件夹的名字 
+def _zip_up(code_uri, zipfile_name):
+    if code_uri is None:
+        raise DeployContextException("Missing the file or the directory to zip up : {} is not valid".format(code_uri))
+    
+    zipfile_name = zipfile_name + '.zip'
+    z = zipfile.ZipFile(zipfile_name, 'w', zipfile.ZIP_DEFLATED)
+    
+    if os.path.isfile(code_uri):
+        z.write(code_uri, os.path.basename(code_uri))
     else:
-        file_news = file_news + '.zip'
-        
-    z = zipfile.ZipFile(file_news,'w',zipfile.ZIP_DEFLATED) #参数一：文件夹名
-    for dirpath, dirnames, filenames in os.walk(startdir):
-        fpath = dirpath.replace(startdir,'') #这一句很重要，不replace的话，就从根目录开始复制
-        fpath = fpath and fpath + os.sep or ''
-        for filename in filenames:
-            z.write(os.path.join(dirpath, filename),fpath+filename)
-            print('%s , zip suceeded!'%(filename))
+        for dirpath, dirnames, filenames in os.walk(code_uri):
+            fpath = dirpath.replace(code_uri, '') #这一句很重要，不replace的话，就从根目录开始复制
+            fpath = fpath and fpath + os.sep or ''
+            for filename in filenames:
+                z.write(os.path.join(dirpath, filename), fpath+filename)
+    
+    LOG.info('%s zip suceeded!', zipfile_name)
     z.close()
     
-
 def _deal_with_func_runtime(function_runtime):
     if function_runtime in ('python','python2','python2.7'):
         return 'python2'
-    if function_runtime in ('nodejs8','nodejs8.5'):
+    elif function_runtime in ('nodejs8','nodejs8.5'):
         return 'nodejs8.4'
+    elif function_runtime in ('java','java8'):
+        return 'java8'
     else:
         raise UserException("Function runtime not supported")
 
