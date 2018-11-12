@@ -11,6 +11,7 @@ LOG = logging.getLogger(__name__)
 class Runtime(Enum):
     nodejs85 = "nodejs8.5"
     python27 = "python2.7"
+    java8 = "java8"
     
     @classmethod
     def has_value(cls, value):
@@ -182,21 +183,7 @@ class CfcContainer(Container):
 
         
         elif runtime == Runtime.java8.value:
-
-            entrypoint = ["/usr/bin/java"] \
-                   + debug_args_list \
-                   + [
-                        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,quiet=y,address=" + str(debug_port),
-                        "-XX:MaxHeapSize=2834432k",
-                        "-XX:MaxMetaspaceSize=163840k",
-                        "-XX:ReservedCodeCacheSize=81920k",
-                        "-XX:+UseSerialGC",
-                        # "-Xshare:on", doesn't work in conjunction with the debug options
-                        "-XX:-TieredCompilation",
-                        "-Djava.net.preferIPv4Stack=true",
-                        "-jar",
-                        "/var/runtime/lib/LambdaJavaRTEntry-1.0.jar",
-                   ]
+            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + [str(debug_port)] + debug_args_list
 
         elif runtime == Runtime.go1x.value:
             entrypoint = ["/var/runtime/aws-lambda-go"] \

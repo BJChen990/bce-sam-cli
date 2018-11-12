@@ -92,3 +92,5 @@ We use `mocha` for testing our code and it is already added in `package.json` un
 cd hello_world
 npm run test
 ```
+
+> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/QuickGuide.html#BSAM.20CLI.E4.BD.BF.E7.94.A8.E7.A4.BA.E4.BE.8B) for more details in how to get started.**

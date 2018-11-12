@@ -24,7 +24,7 @@ class CfcRuntime(object):
     This class is **not** intended to be an local replica of the CFC APIs.
     """
 
-    SUPPORTED_ARCHIVE_EXTENSIONS = (".zip", ".jar", ".ZIP", ".JAR")
+    SUPPORTED_ARCHIVE_EXTENSIONS = (".jar")
 
     def __init__(self, container_manager):
         """
@@ -69,7 +69,7 @@ class CfcRuntime(object):
             environ.add_install_flag()
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
-        with self._get_code_dir(function_config.code_abs_path) as code_dir:
+        with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
             container = CfcContainer(function_config.runtime,
                                         function_config.handler,
                                         code_dir,
@@ -147,7 +147,7 @@ class CfcRuntime(object):
             return timer
 
     @contextmanager
-    def _get_code_dir(self, code_path):
+    def _get_code_dir(self, function_config, cwd, is_installing):
         """
         Method to get a path to a directory where the CFC function code is available. This directory will
         be mounted directly inside the Docker container.
@@ -161,22 +161,44 @@ class CfcRuntime(object):
         :param string code_path: Path to the code. This could be pointing at a file or folder either on a local
             disk or in some network file system
         :return string: Directory containing CFC function code. It can be mounted directly in container
-        """
+        """        
 
-        decompressed_dir = None
+        code_path = function_config.code_abs_path
+        tmp_dir = None        
 
         try:
-            if os.path.isfile(code_path) and code_path.endswith(self.SUPPORTED_ARCHIVE_EXTENSIONS):
-
-                decompressed_dir = _unzip_file(code_path)
-                yield decompressed_dir
+            if is_installing:
+                if function_config.runtime == "java8":                
+                    yield cwd          # where template.yaml is
+                else:
+                    yield code_path
+            
+            elif os.path.isfile(code_path) and code_path.endswith(self.SUPPORTED_ARCHIVE_EXTENSIONS):
+                tmp_dir = _get_tmp_dir(code_path)
+                yield tmp_dir
 
             else:
-                LOG.debug("Code %s is not a zip/jar file", code_path)
+                LOG.debug("Code %s is not a jar file", code_path)
                 yield code_path
         finally:
-            if decompressed_dir:
-                shutil.rmtree(decompressed_dir)
+            if tmp_dir:
+                shutil.rmtree(tmp_dir)
+
+def _get_tmp_dir(filepath):
+    """
+    copy .jar to a temporary directory
+    """
+
+    tmp_dir = tempfile.mkdtemp()
+    if os.name == 'posix':
+        os.chmod(tmp_dir, 0o755)
+
+    LOG.info("Copying %s to a temporary directory", filepath)
+
+    shutil.copyfile(filepath, os.path.join(tmp_dir, "tmp.jar"))
+    
+    return os.path.realpath(tmp_dir)
+
 
 def _unzip_file(filepath):
     """

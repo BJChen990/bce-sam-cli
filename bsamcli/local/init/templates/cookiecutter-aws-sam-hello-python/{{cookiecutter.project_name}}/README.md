@@ -7,8 +7,8 @@ This is a sample template for {{ cookiecutter.project_name }} - Below is a brief
 ├── README.md                   <-- This instructions file
 ├── hello_world                 <-- Source code for a CFC function
 │   ├── __init__.py
-│   └── index.py                <-- CFC function code
-├── requirements.txt            <-- Python dependencies
+│   ├── index.py                <-- CFC function code
+│   └── requirements.txt        <-- Python dependencies
 ├── template.yaml               <-- BSAM template
 └── tests                       <-- Unit tests
     └── unit
@@ -93,3 +93,5 @@ Next, we run `pytest` against our `tests` folder to run our initial unit tests:
 ```bash
 python -m pytest tests/ -v
 ```
+
+> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/QuickGuide.html#BSAM.20CLI.E4.BD.BF.E7.94.A8.E7.A4.BA.E4.BE.8B) for more details in how to get started.**
