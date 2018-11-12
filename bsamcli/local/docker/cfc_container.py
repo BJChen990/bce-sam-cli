@@ -10,6 +10,7 @@ LOG = logging.getLogger(__name__)
 
 class Runtime(Enum):
     nodejs85 = "nodejs8.5"
+    nodejs611 = "nodejs6.11"
     python27 = "python2.7"
     java8 = "java8"
     
@@ -172,18 +173,11 @@ class CfcContainer(Container):
         # configs from: https://github.com/lambci/docker-lambda
         # to which we add the extra debug mode options
         entrypoint = None
-        if runtime == Runtime.nodejs85.value:
-
-            entrypoint = ["/var/runtime/bin/start_invoke.sh"] \
-                            + [str(debug_port)] \
-                            + debug_args_list
+        if runtime in [Runtime.nodejs85.value, Runtime.nodejs611.value, Runtime.java8.value]:
+            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + [str(debug_port)] + debug_args_list
         
         elif runtime == Runtime.python27.value:
             entrypoint = ["/var/runtime/bin/start_invoke.sh"] + debug_args_list
-
-        
-        elif runtime == Runtime.java8.value:
-            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + [str(debug_port)] + debug_args_list
 
         elif runtime == Runtime.go1x.value:
             entrypoint = ["/var/runtime/aws-lambda-go"] \
@@ -193,20 +187,6 @@ class CfcContainer(Container):
                     "-delvePort=" + str(debug_port),
                     "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
                   ]
-
-        elif runtime == Runtime.nodejs.value:
-
-            entrypoint = ["/usr/bin/node"] \
-                   + debug_args_list \
-                   + [
-                       "--debug-brk=" + str(debug_port),
-                       "--nolazy",
-                       "--max-old-space-size=1229",
-                       "--max-new-space-size=153",
-                       "--max-executable-size=153",
-                       "--expose-gc",
-                       "/var/runtime/node_modules/awslambda/bin/awslambda",
-                   ]
 
         elif runtime == Runtime.nodejs43.value:
 
@@ -220,21 +200,7 @@ class CfcContainer(Container):
                        "--max-executable-size=160",
                        "--expose-gc",
                        "/var/runtime/node_modules/awslambda/index.js",
-                   ]
-
-        elif runtime == Runtime.nodejs610.value:
-
-            entrypoint = ["/var/lang/bin/node"] \
-                   + debug_args_list \
-                   + [
-                       "--debug-brk=" + str(debug_port),
-                       "--nolazy",
-                       "--max-old-space-size=2547",
-                       "--max-semi-space-size=150",
-                       "--max-executable-size=160",
-                       "--expose-gc",
-                       "/var/runtime/node_modules/awslambda/index.js",
-                   ]
+                   ]        
 
         elif runtime == Runtime.python36.value:
 

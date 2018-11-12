@@ -17,6 +17,7 @@ RUNTIME_TEMPLATE_MAPPING = {
     "python2.7": os.path.join(_templates, "cookiecutter-aws-sam-hello-python"),
     "python": os.path.join(_templates, "cookiecutter-aws-sam-hello-python"),
     "nodejs8.5": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
+    "nodejs6.11": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
     "nodejs": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
     "java8": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
 }
