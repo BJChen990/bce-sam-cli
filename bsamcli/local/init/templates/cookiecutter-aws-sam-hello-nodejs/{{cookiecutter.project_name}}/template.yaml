@@ -1,5 +1,5 @@
 BCETemplateFormatVersion: '2010-09-09'
-Transform: BCE::Serverless-2016-10-31
+Transform: BCE::Serverless-2018-08-30
 Description: >
     {{ cookiecutter.project_name }}
 
@@ -12,7 +12,7 @@ Resources:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/master/versions/2016-10-31.md#bceserverlessfunction
         Properties:
             CodeUri: hello_world/
-            Handler: app.handler
+            Handler: index.handler
             {%- if cookiecutter.runtime == 'nodejs6.11' %}
             Runtime: nodejs6.11
             {%- else %}
