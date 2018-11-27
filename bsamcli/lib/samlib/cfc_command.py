@@ -177,7 +177,7 @@ def _deal_with_func_runtime(function_runtime):
     if function_runtime in ('python','python2','python2.7'):
         return 'python2'
     elif function_runtime in ('nodejs8','nodejs8.5'):
-        return 'nodejs8.4'
+        return 'nodejs8.5'
     elif function_runtime in ('java','java8'):
         return 'java8'
     else:
