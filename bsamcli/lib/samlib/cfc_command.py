@@ -68,7 +68,7 @@ def _do_deploy(context, function, region):
     else:
         _create_function(cfc_client, function)
         _create_event_source(cfc_client, function, context)
-    LOG.info("deploy done.")  
+    LOG.info("deploy done.")
 
 
 def _check_if_exist(cfc_client, function_name):
@@ -121,8 +121,7 @@ def _update_function(cfc_client, function):
     base64_file = _get_function_base64_file(function_name)
     try:
         update_function_code_response = cfc_client.update_function_code(function.name,
-                                                                    zip_file=base64_file,
-                                                                    publish=True)        
+                                                                    zip_file=base64_file)        
         LOG.info("Function Update Response: %s\n", str(update_function_code_response))
 
         update_func_config_response = cfc_client.update_function_configuration(function.name,
