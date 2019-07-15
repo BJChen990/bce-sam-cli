@@ -22,11 +22,11 @@
       "device": {
         "deviceId": "30e36bfaae1c30ff9707b3f2d4e1b63c",
         "supportedInterfaces": {
-          "VoiceInput": [],
-          "VoiceOutput": [],
-          "AudioPlayer": [],
-          "Display": [],
-          "VideoPlayer": []
+          "VoiceInput": {},
+          "VoiceOutput": {},
+          "AudioPlayer": {},
+          "Display": {},
+          "VideoPlayer": {}
         }
       },
       "apiAccessToken": "v6T84SUT+tFuZ0sSOFZxMv0g68JfA",
