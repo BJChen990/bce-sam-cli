@@ -9,7 +9,7 @@ Description: >
 Resources:
 
     HelloWorldFunction:
-        Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/master/versions/2016-10-31.md#bceserverlessfunction
+        Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
             CodeUri: hello_world/
             Handler: index.handler
@@ -18,7 +18,7 @@ Resources:
             {%- else %}
             Runtime: nodejs8.5
             {%- endif %}
-            Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE
                     

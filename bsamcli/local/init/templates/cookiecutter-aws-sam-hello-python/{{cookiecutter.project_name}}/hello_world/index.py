@@ -21,7 +21,7 @@ def handler(event, context):
             "isBase64Encoded": "A boolean flag to indicate if the applicable request payload is Base64-encode"
         }
 
-        https://docs.bce.baidu.com/apigateway/latest/developerguide/set-up-cfc-proxy-integrations.html#api-gateway-simple-proxy-for-cfc-input-format
+        Tutorial Doc: https://cloud.baidu.com/doc/CFC/s/Bjwvz3y8z
 
     context: object, required
         CFC Context runtime methods and attributes
@@ -48,9 +48,7 @@ def handler(event, context):
     context.log_stream_name: str
          Cloudwatch Log stream name
     context.memory_limit_in_mb: int
-        Function memory
-
-        https://docs.bce.baidu.com/cfc/latest/dg/python-context-object.html
+        Function memory        
 
     Returns
     ------
@@ -63,9 +61,7 @@ def handler(event, context):
             "headers": {"headerName": "headerValue", ...},
             "body": "..."
         }
-
-        # api-gateway-simple-proxy-for-cfc-output-format
-        https: // docs.bce.baidu.com/apigateway/latest/developerguide/set-up-cfc-proxy-integrations.html
+                
     """
 
     return {

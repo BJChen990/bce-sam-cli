@@ -1,6 +1,6 @@
 /**
  *
- * Event doc: https://cloud.baidu.com/doc/CFC/DevRef.html#event.E7.9A.84.E6.A0.BC.E5.BC.8F
+ * Tutorial Doc: https://cloud.baidu.com/doc/CFC/s/Bjwvz3y8z
  * @param {Object} event - CFC Http Trigger Input Format
  * @param {string} event.resource - Resource path.
  * @param {string} event.path - Path parameter.
@@ -20,7 +20,6 @@
  * @param {string} context.functionbrn - Function BRN.
  * @param {string} context.clientContext - client Context.
  *
- * Return doc: https://cloud.baidu.com/doc/CFC/DevRef.html#event.E7.9A.84.E6.A0.BC.E5.BC.8F
  * @returns {Object} object - CFC Proxy Output Format
  * @returns {boolean} object.isBase64Encoded - A boolean flag to indicate if the applicable payload is Base64-encode (binary support)
  * @returns {string} object.statusCode - HTTP Status Code to be returned to the client
