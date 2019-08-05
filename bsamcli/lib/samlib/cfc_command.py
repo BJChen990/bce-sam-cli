@@ -93,12 +93,16 @@ def _create_function(cfc_client, function):
     user_runtime = _deal_with_func_runtime(function.runtime)
     user_region = get_region()
     
+    env = function.environment
+    if env != None:
+        env = env.get("Variables", None)
+    
     try:
         create_response = cfc_client.create_function(function_name,
                                                  description=function.description or "cfc function from bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
-                                                 environment=function.environment.get("Variables", None),
+                                                 environment=env,
                                                  region=user_region,
                                                  zip_file=base64_file,
                                                  publish=False,
@@ -122,16 +126,21 @@ def _update_function(cfc_client, function):
     try:
         update_function_code_response = cfc_client.update_function_code(function.name,
                                                                     zip_file=base64_file)        
-        LOG.info("Function Update Response: %s\n", str(update_function_code_response))
+                
+        LOG.info("function code updated")
+
+        env = function.environment
+        if env != None:
+            env = env.get("Variables", None)
 
         update_func_config_response = cfc_client.update_function_configuration(function.name,
-                                            environment=function.environment.get("Variables", None),
+                                            environment=env,
                                             handler=function.handler,
                                             run_time=_deal_with_func_runtime(function.runtime),
                                             timeout=function.timeout,
                                             description=function.description)
-
-        LOG.info("Function Configuration Update Response: %s", str(update_func_config_response))
+        
+        LOG.info("function configuration updated")
 
 
     except(BceServerError,BceHttpClientError) as e:
