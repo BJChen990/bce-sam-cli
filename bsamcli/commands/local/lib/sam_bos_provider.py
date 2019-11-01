@@ -102,7 +102,7 @@ class SamBosProvider(EventSourceProvider):
 
             if resource_type == SamBosProvider._SERVERLESS_FUNCTION:
                 result[logical_id] = self._extract_bos_from_function(logical_id, resource)
-                
+
         return result
 
     @staticmethod
@@ -118,12 +118,12 @@ class SamBosProvider(EventSourceProvider):
         function_resource : dict
             Contents of the function resource including its properties
         """
- 
+
         bos_events = []
         count = 0
 
         resource_properties = function_resource.get("Properties", {})
-        serverless_function_events = resource_properties.get(SamBosProvider._FUNCTION_EVENT, {})    
+        serverless_function_events = resource_properties.get(SamBosProvider._FUNCTION_EVENT, {})
 
         for _, event in serverless_function_events.items():
             if SamBosProvider._FUNCTION_EVENT_TYPE_BOS == event.get(SamBosProvider._TYPE):
@@ -150,11 +150,11 @@ class SamBosProvider(EventSourceProvider):
         if isinstance(event_types, str):
             event_types = [event_types]
 
-        if event_types is None or bucket_name is None: 
+        if event_types is None or bucket_name is None:
             raise InvalidSamDocumentException("Bucket or Event_types of BOS Event is empty")
 
         for event_type in event_types:
-            if event_type not in SamBosProvider._ANY_EVENT_TYPE:                
+            if event_type not in SamBosProvider._ANY_EVENT_TYPE:
                 raise InvalidSamDocumentException("Invalid event_type: {}".format(event_type))
 
         return BosEvent(prefix=prefix, suffix=suffix, bucket=bucket_name,
@@ -162,7 +162,7 @@ class SamBosProvider(EventSourceProvider):
 
     def deploy(self, cfc_client, func_config):
         bos_events = self.get(func_config.FunctionName)
-        
+
         for event in bos_events:
             data = {
                 "EventType": event.event_types,
@@ -173,10 +173,10 @@ class SamBosProvider(EventSourceProvider):
 
             try:
                 event_info = "<EventTypes: %s, Prefix: %s, Suffix: %s>" % (', '.join(data["EventType"]), data["Prefix"], data["Suffix"])
-                
-                cfc_client.create_event_source(func_config.FunctionBrn, "bos/" + event.bucket, data)
+
+                cfc_client.create_trigger(func_config.FunctionBrn, "bos/" + event.bucket, data)
                 LOG.info("BOS event source %s deploy succ!", event_info)
-                
+
             except BaseException as e:
                 LOG.info("BOS event source %s deploy failed!", event_info)
                 LOG.info("Error msg: %s", str(e))

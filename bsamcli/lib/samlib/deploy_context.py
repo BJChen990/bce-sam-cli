@@ -4,7 +4,7 @@ import os
 import yaml
 
 from bsamcli.yamlhelper import yaml_parse
-from user_exceptions import DeployContextException
+from bsamcli.lib.samlib.user_exceptions import DeployContextException
 from bsamcli.local.lambdafn.exceptions import FunctionNotFound
 from bsamcli.commands.local.lib.sam_function_provider import SamFunctionProvider
 from bsamcli.commands.local.lib.sam_bos_provider import SamBosProvider

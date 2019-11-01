@@ -208,7 +208,7 @@ class LocalLambdaRunner(object):
         if bce_credentials.secret_access_key != "" :
             result["secret"] = bce_credentials.secret_access_key
 
-        if bce_credentials.session_token != "" :
-            result["token"] = bce_credentials.session_token
+        # if bce_credentials.session_token != "" :
+        #     result["token"] = bce_credentials.session_token
 
         return result

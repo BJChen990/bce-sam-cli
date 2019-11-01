@@ -44,8 +44,8 @@ setup(
     license=read('LICENSE'),
     packages=find_packages(exclude=('tests', 'docs')),
     keywords="BCE SAM CLI",
-    # Support Python 2.7 and 3.6 or greater
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
+    # Support Python 3.6 or greater
+    python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             '{}=bsamcli.cli.main:cli'.format(cmd_name)
@@ -64,8 +64,7 @@ setup(
         'Intended Audience :: Information Technology',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python',        
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet',
         'Topic :: Software Development :: Build Tools',

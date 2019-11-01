@@ -25,5 +25,5 @@ def get_config(region):
         region = "bj"
     elif region not in SUPPORTED_REGION:
         LOG.info("unsupported region: %s", region)
-     
+
     return BceClientConfiguration(credentials=get_credentials(), endpoint=endpointMap.get(region))

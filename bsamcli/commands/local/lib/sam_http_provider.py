@@ -98,7 +98,7 @@ class SamHttpProvider(EventSourceProvider):
 
             if resource_type == SamHttpProvider._SERVERLESS_FUNCTION:
                 result[logical_id] = self._extract_http_from_function(logical_id, resource)
-                
+
         return result
 
     @staticmethod
@@ -114,12 +114,12 @@ class SamHttpProvider(EventSourceProvider):
         function_resource : dict
             Contents of the function resource including its properties
         """
- 
+
         http_events = []
         count = 0
 
         resource_properties = function_resource.get("Properties", {})
-        serverless_function_events = resource_properties.get(SamHttpProvider._FUNCTION_EVENT, {})    
+        serverless_function_events = resource_properties.get(SamHttpProvider._FUNCTION_EVENT, {})
 
         for _, event in serverless_function_events.items():
             if SamHttpProvider._FUNCTION_EVENT_TYPE_HTTP == event.get(SamHttpProvider._TYPE):
@@ -145,37 +145,37 @@ class SamHttpProvider(EventSourceProvider):
         if isinstance(methods, str):
             methods = [methods]
 
-        if methods is None or resource_path is None: 
-            raise InvalidSamDocumentException("Method or ResourePath of HTTP Event is empty")            
-        
+        if methods is None or resource_path is None:
+            raise InvalidSamDocumentException("Method or ResourePath of HTTP Event is empty")
+
         methods = [m.upper() for m in methods]
         for m in methods:
             if m not in SamHttpProvider._ANY_METHOD_TYPE:
-                raise InvalidSamDocumentException("Invalid Http Method: {}".format(methods))        
+                raise InvalidSamDocumentException("Invalid Http Method: {}".format(methods))
         methods = ",".join(methods)
 
         if auth_type not in SamHttpProvider._ANY_AUTH_TYPE:
-            raise InvalidSamDocumentException("Invalid Http AuthType: {}".format(auth_type))        
+            raise InvalidSamDocumentException("Invalid Http AuthType: {}".format(auth_type))
 
         return HttpEvent(resource_path=resource_path, method=methods,
             auth_type=auth_type, function_name=logical_id)
 
     def deploy(self, cfc_client, func_config):
         http_events = self.get(func_config.FunctionName)
-        
+
         for event in http_events:
             data = {
-                "ResourcePath": event.resource_path,                
+                "ResourcePath": event.resource_path,
                 "Method": event.method,
                 "AuthType": event.auth_type
             }
 
             try:
                 event_info = "<ResourcePath: %s, Method: %s, AuthType: %s>" % (data["ResourcePath"], data["Method"], data["AuthType"])
-                
-                cfc_client.create_event_source(func_config.FunctionBrn, "cfc-http-trigger/v1/CFCAPI", data)
+
+                cfc_client.create_trigger(func_config.FunctionBrn, "cfc-http-trigger/v1/CFCAPI", data)
                 LOG.info("HTTP event source %s deploy succ!", event_info)
-                
+
             except BaseException as e:
                 LOG.info("HTTP event source %s deploy failed!", event_info)
                 LOG.info("Error msg: %s", str(e))

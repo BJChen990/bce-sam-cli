@@ -1,6 +1,6 @@
 # 一个function下可以有多个bos event，分别去创建
 
-"""Class that resolve BOS event from a SAM Template"""
+"""Class that resolve DuerOS event from a SAM Template"""
 
 import logging
 from collections import namedtuple
@@ -80,7 +80,7 @@ class SamDuerosProvider(EventSourceProvider):
             if resource_type == SamDuerosProvider._SERVERLESS_FUNCTION:
                 if self._extract_dueros_from_function(logical_id, resource) is True:
                     result[logical_id] = DuerosEvent(function_name=logical_id)
-                
+
         return result
 
     @staticmethod
@@ -99,24 +99,24 @@ class SamDuerosProvider(EventSourceProvider):
         count = 0
 
         resource_properties = function_resource.get("Properties", {})
-        serverless_function_events = resource_properties.get(SamDuerosProvider._FUNCTION_EVENT, {})    
+        serverless_function_events = resource_properties.get(SamDuerosProvider._FUNCTION_EVENT, {})
 
         for _, event in serverless_function_events.items():
             if SamDuerosProvider._FUNCTION_EVENT_TYPE_DUEROS == event.get(SamDuerosProvider._TYPE):
                 LOG.debug("Found Dueros Events in Serverless function with name '%s'", logical_id)
                 count += 1
-        
+
         if count > 1:
             raise ValueError('A function can only have one DUEROS event source.')
-        
+
         return count == 1
 
     def deploy(self, cfc_client, func_config):
         dueros_events = self.get(func_config.FunctionName)
         if dueros_events is not None:
             try:
-                cfc_client.create_event_source(func_config.FunctionBrn, "dueros")
-                LOG.info("Dueros event source deploy succ!")                
+                cfc_client.create_trigger(func_config.FunctionBrn, "dueros")
+                LOG.info("Dueros event source deploy succ!")
             except BaseException as e:
                 LOG.info("Dueros event source deploy failed!")
                 LOG.info("Error msg: %s", str(e))

@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import os
-import ConfigParser
+import configparser
 
 from baidubce.auth.bce_credentials import BceCredentials
 from bsamcli.commands.exceptions import UserException
@@ -27,14 +27,13 @@ def get_credentials():
         raise UserException("credential file not found : {} does not exist, try sam config".format(default_credential_file))
     #生成config对象
     safe_config_json = {ACCESS_KEY_OPTION_NAME: "", SECRET_KEY_OPTION_NAME: "", BCE_SESSION_TOKEN: ""}
-    conf = ConfigParser.SafeConfigParser(safe_config_json)
+    conf = configparser.SafeConfigParser(safe_config_json)
     #用config对象读取配置文件
     conf.read(default_credential_file)
     #指定section，option读取值
     ak = conf.get(CREDENTIAL_SECTION_NAME, ACCESS_KEY_OPTION_NAME)
-    sk = conf.get(CREDENTIAL_SECTION_NAME, SECRET_KEY_OPTION_NAME)
-    token = conf.get(CREDENTIAL_SECTION_NAME, BCE_SESSION_TOKEN)
-    return BceCredentials(ak,sk,token)
+    sk = conf.get(CREDENTIAL_SECTION_NAME, SECRET_KEY_OPTION_NAME)    
+    return BceCredentials(ak, sk)
 
 
 def get_region():
@@ -44,7 +43,7 @@ def get_region():
     if not os.path.exists(default_credential_file):
         raise UserException("credential file not found : {} does not exist, try sam config".format(default_config_file))
     #生成config对象
-    conf = ConfigParser.SafeConfigParser({"region": DEFAULT_REGION})
+    conf = configparser.SafeConfigParser({"region": DEFAULT_REGION})
     #用config对象读取配置文件
     conf.read(default_config_file)
     #指定section，option读取值
@@ -89,7 +88,7 @@ def config_interactive(config_folder, ak="", sk="", region=""):
 
 
 def __init_credential_config(credential_path):
-    conf = ConfigParser.SafeConfigParser()
+    conf = configparser.SafeConfigParser()
     conf.read(open(credential_path,"w+"))
     conf.add_section(CREDENTIAL_SECTION_NAME)
     conf.set(CREDENTIAL_SECTION_NAME,ACCESS_KEY_OPTION_NAME,"")
@@ -98,7 +97,7 @@ def __init_credential_config(credential_path):
 
 
 def __init_cfc_config(config_path):
-    conf = ConfigParser.SafeConfigParser()
+    conf = configparser.SafeConfigParser()
     conf.read(open(config_path,"w+"))    
     conf.add_section(CONFIG_SECTION_NAME)
     conf.set(CONFIG_SECTION_NAME,"region",DEFAULT_REGION)
@@ -106,7 +105,7 @@ def __init_cfc_config(config_path):
 
 
 def __set_credential_config(credential_path, ak, sk):
-    conf = ConfigParser.SafeConfigParser()
+    conf = configparser.SafeConfigParser()
     conf.read(credential_path)
     if CREDENTIAL_SECTION_NAME not in conf.sections():
         conf.add_section(CREDENTIAL_SECTION_NAME)
@@ -116,9 +115,9 @@ def __set_credential_config(credential_path, ak, sk):
 
 
 def __set_cfc_config(config_path, region):
-    conf = ConfigParser.SafeConfigParser()
+    conf = configparser.SafeConfigParser()
     conf.read(config_path)
     if CONFIG_SECTION_NAME not in conf.sections():
         conf.add_section(CONFIG_SECTION_NAME)
-    conf.set(CONFIG_SECTION_NAME,"region", region)
-    conf.write(open(config_path,"w"))
+    conf.set(CONFIG_SECTION_NAME, "region", region)
+    conf.write(open(config_path, "w"))
