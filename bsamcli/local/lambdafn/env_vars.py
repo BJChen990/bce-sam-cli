@@ -72,7 +72,7 @@ class EnvironmentVariables(object):
         self.variables = variables or {}
         self.shell_env_values = shell_env_values or {}
         self.override_values = override_values or {}
-        self.bce_creds = bce_creds or {}        
+        self.bce_creds = bce_creds or {}
 
     def resolve(self):
         """
@@ -155,7 +155,7 @@ class EnvironmentVariables(object):
             "BCE_ACCESS_KEY_SECRET": self.bce_creds.get("secret", self._DEFAULT_BCE_CREDS["secret"]),
 
             "_HANDLER": self.handler,
-            "_TIMEOUT": self.timeout,            
+            "_TIMEOUT": self.timeout,
 
             # Additional variables we don't fill in
             # "BCE_ACCOUNT_ID="

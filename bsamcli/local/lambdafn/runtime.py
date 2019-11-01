@@ -161,18 +161,18 @@ class CfcRuntime(object):
         :param string code_path: Path to the code. This could be pointing at a file or folder either on a local
             disk or in some network file system
         :return string: Directory containing CFC function code. It can be mounted directly in container
-        """        
+        """
 
         code_path = function_config.code_abs_path
-        tmp_dir = None        
+        tmp_dir = None
 
         try:
             if is_installing:
-                if function_config.runtime == "java8":                
+                if function_config.runtime == "java8":
                     yield cwd          # where template.yaml is
                 else:
                     yield code_path
-            
+
             elif os.path.isfile(code_path) and code_path.endswith(self.SUPPORTED_ARCHIVE_EXTENSIONS):
                 tmp_dir = _get_tmp_dir(code_path)
                 yield tmp_dir
@@ -196,7 +196,7 @@ def _get_tmp_dir(filepath):
     LOG.info("Copying %s to a temporary directory", filepath)
 
     shutil.copyfile(filepath, os.path.join(tmp_dir, "tmp.jar"))
-    
+
     return os.path.realpath(tmp_dir)
 
 

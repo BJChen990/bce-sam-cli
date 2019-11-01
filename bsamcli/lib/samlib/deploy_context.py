@@ -1,3 +1,7 @@
+"""
+Template.yaml parser
+"""
+
 import json
 import sys
 import os
@@ -68,12 +72,12 @@ class DeployContext(object):
     @property
     def all_functions(self):
         all_functions = [f for f in self._function_provider.get_all()]
-        if len(all_functions) == 0:
+        if not all_functions:
             raise FunctionNotFound("Unable to find a single Function in the template file")
         return all_functions
 
     def deploy(self, cfc_client, func_config):
-        for p in self._event_source_provider:            
+        for p in self._event_source_provider:
             p.deploy(cfc_client, func_config)
 
     @property
@@ -222,3 +226,4 @@ class DeployContext(object):
             return None
 
         return open(log_file, 'wb')
+        

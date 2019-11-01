@@ -1,10 +1,10 @@
 """
 Represents Cfc runtime containers.
 """
-from enum import Enum
 
-from .container import Container
 import logging
+from enum import Enum
+from .container import Container
 
 LOG = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class Runtime(Enum):
     nodejs611 = "nodejs6.11"
     python27 = "python2.7"
     java8 = "java8"
-    
+
     @classmethod
     def has_value(cls, value):
         """
@@ -146,7 +146,6 @@ class CfcContainer(Container):
         :return: Name of Docker Image for the given runtime
         """
         return "{}:{}".format(CfcContainer._IMAGE_REPO_NAME, runtime)
-        
 
     @staticmethod
     def _get_entry_point(runtime, debug_options=None):
@@ -175,39 +174,25 @@ class CfcContainer(Container):
         entrypoint = None
         if runtime in [Runtime.nodejs85.value, Runtime.nodejs611.value, Runtime.java8.value]:
             entrypoint = ["/var/runtime/bin/start_invoke.sh"] + [str(debug_port)] + debug_args_list
-        
+
         elif runtime == Runtime.python27.value:
             entrypoint = ["/var/runtime/bin/start_invoke.sh"] + debug_args_list
 
-        elif runtime == Runtime.go1x.value:
-            entrypoint = ["/var/runtime/aws-lambda-go"] \
-                + debug_args_list \
-                + [
-                    "-debug=true",
-                    "-delvePort=" + str(debug_port),
-                    "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
-                  ]
+        # elif runtime == Runtime.go1x.value:
+        #     entrypoint = ["/var/runtime/aws-lambda-go"] \
+        #         + debug_args_list \
+        #         + [
+        #             "-debug=true",
+        #             "-delvePort=" + str(debug_port),
+        #             "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
+        #           ]
 
-        elif runtime == Runtime.nodejs43.value:
+        # elif runtime == Runtime.python36.value:
 
-            entrypoint = ["/usr/local/lib64/node-v4.3.x/bin/node"] \
-                   + debug_args_list \
-                   + [
-                       "--debug-brk=" + str(debug_port),
-                       "--nolazy",
-                       "--max-old-space-size=2547",
-                       "--max-semi-space-size=150",
-                       "--max-executable-size=160",
-                       "--expose-gc",
-                       "/var/runtime/node_modules/awslambda/index.js",
-                   ]        
-
-        elif runtime == Runtime.python36.value:
-
-            entrypoint = ["/var/lang/bin/python3.6"] \
-                   + debug_args_list \
-                   + [
-                       "/var/runtime/awslambda/bootstrap.py"
-                   ]
+        #     entrypoint = ["/var/lang/bin/python3.6"] \
+        #            + debug_args_list \
+        #            + [
+        #                "/var/runtime/awslambda/bootstrap.py"
+        #            ]
 
         return entrypoint

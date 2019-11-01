@@ -42,7 +42,7 @@ def do_cli(ctx, function_identifier, template):
     LOG.debug("local install command is called")
 
     try:
-        with InvokeContext(template_file=template, 
+        with InvokeContext(template_file=template,
                             function_identifier=function_identifier,
                             skip_pull_image=True) as context:
             # reuse invoke to enter the container, but don't actually invoke user function

@@ -1,4 +1,6 @@
-# coding=utf-8
+"""
+BCE configuration for deployment
+"""
 
 import logging
 
@@ -7,7 +9,6 @@ from baidubce.auth.bce_credentials import BceCredentials
 
 from bsamcli.yamlhelper import yaml_parse
 from bsamcli.lib.samlib.cfc_credential_helper import get_credentials, get_region
-
 
 LOG = logging.getLogger(__name__)
 

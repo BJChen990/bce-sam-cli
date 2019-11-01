@@ -133,7 +133,7 @@ DuerosEvent = namedtuple("DuerosEvent", [
 HttpEvent = namedtuple("HttpEvent", [
     # String
     "function_name",
-    
+
     # String
     "resource_path",
 
@@ -154,6 +154,6 @@ class EventSourceProvider(object):
         :return Function: namedtuple containing the Function information
         """
         raise NotImplementedError("not implemented")
-    
+
     def deploy(self, cfc_client, func_config):
         raise NotImplementedError("not implemented")

@@ -52,7 +52,7 @@ class LocalLambdaRunner(object):
         self.env_vars_values = env_vars_values or {}
         self.aws_profile = aws_profile
         self.aws_region = aws_region
-        self.debug_context = debug_context        
+        self.debug_context = debug_context
 
     def invoke(self, function_name, event, is_installing=None, stdout=None, stderr=None):
         """
@@ -202,10 +202,10 @@ class LocalLambdaRunner(object):
 
         result = {}
         bce_credentials = get_credentials()
-        if bce_credentials.access_key_id != "" :
+        if bce_credentials.access_key_id != "":
             result["key"] = bce_credentials.access_key_id
 
-        if bce_credentials.secret_access_key != "" :
+        if bce_credentials.secret_access_key != "":
             result["secret"] = bce_credentials.secret_access_key
 
         # if bce_credentials.session_token != "" :

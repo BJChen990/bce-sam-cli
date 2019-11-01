@@ -1,4 +1,6 @@
-# coding=utf-8
+"""
+Execution of package and deploy command
+"""
 
 import logging
 import platform

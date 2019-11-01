@@ -75,10 +75,10 @@ def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_
                            docker_volume_basedir=docker_volume_basedir,
                            docker_network=docker_network,
                            log_file=log_file,
-                           skip_pull_image=skip_pull_image,                           
+                           skip_pull_image=skip_pull_image,
                            aws_profile=profile,
                            debug_port=debug_port,
-                           debug_args=debug_args,                           
+                           debug_args=debug_args,
                            aws_region=region) as context:
 
             # Invoke the function
