@@ -3,13 +3,12 @@ Reads CLI arguments and performs necessary preparation to be able to run the fun
 """
 
 import errno
-import json
 import sys
+import json
 import os
-import yaml
-
 import docker
 import requests
+import yaml
 
 from bsamcli.yamlhelper import yaml_parse
 from bsamcli.commands.local.lib.local_lambda import LocalLambdaRunner
@@ -76,7 +75,7 @@ class InvokeContext(object):
             Path to a file to send container output to. If the file does not exist, it will be
             created
         skip_pull_image bool
-            Should we skip pulling the Docker container image?        
+            Should we skip pulling the Docker container image?
         aws_profile str
             Name of the profile to fetch AWS credentials from
         debug_port int

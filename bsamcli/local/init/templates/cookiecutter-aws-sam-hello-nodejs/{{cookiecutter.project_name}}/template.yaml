@@ -12,12 +12,8 @@ Resources:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
             CodeUri: hello_world/
-            Handler: index.handler
-            {%- if cookiecutter.runtime == 'nodejs6.11' %}
-            Runtime: nodejs6.11
-            {%- else %}
-            Runtime: nodejs8.5
-            {%- endif %}
+            Handler: index.handler            
+            Runtime: nodejs8.5            
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE

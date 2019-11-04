@@ -63,9 +63,7 @@ Project Status
 
 -  [ ] Supported AWS Lambda Runtimes
 
-   -  [x] ``nodejs``
-   -  [x] ``nodejs4.3``
-   -  [x] ``nodejs6.10``
+   -  [x] ``nodejs``      
    -  [x] ``nodejs8.10``
    -  [x] ``java8``
    -  [x] ``python2.7``
@@ -82,8 +80,6 @@ Project Status
 -  [x] Generating boilerplate templates
 
    -  [x] ``nodejs``
-   -  [x] ``nodejs4.3``
-   -  [x] ``nodejs6.10``
    -  [x] ``nodejs8.10``
    -  [x] ``java8``
    -  [x] ``python2.7``

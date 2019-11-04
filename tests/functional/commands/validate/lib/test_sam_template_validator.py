@@ -1,8 +1,12 @@
+"""
+Unit test for template validation
+"""
+
 from unittest import TestCase
 from mock import Mock
 
-from samcli.commands.validate.lib.sam_template_validator import SamTemplateValidator
-from samcli.commands.validate.lib.exceptions import InvalidSamDocumentException
+from bsamcli.commands.validate.lib.sam_template_validator import SamTemplateValidator
+from bsamcli.commands.validate.lib.exceptions import InvalidSamDocumentException
 
 
 class TestValidate(TestCase):
@@ -17,7 +21,7 @@ class TestValidate(TestCase):
                     "Properties": {
                         "Handler": "index.handler",
                         "CodeUri": "s3://fake-bucket/lambda-code.zip",
-                        "Runtime": "nodejs6.10",
+                        "Runtime": "nodejs8.5",
                         "Timeout": 60
                     }
                 }
@@ -66,7 +70,7 @@ class TestValidate(TestCase):
                     "Properties": {
                         "Handler": "index.handler",
                         "CodeUri": "./",
-                        "Runtime": "nodejs6.10",
+                        "Runtime": "nodejs8.5",
                         "Timeout": 60
                         }
                     }
@@ -152,7 +156,7 @@ class TestValidate(TestCase):
                             "Key": "code.zip",
                             "Version": 121212
                             },
-                        "Runtime": "nodejs6.10",
+                        "Runtime": "8.5",
                         "Timeout": 60
                         }
                     }

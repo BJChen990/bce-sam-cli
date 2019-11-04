@@ -11,9 +11,7 @@ from samcli.local.docker.lambda_container import LambdaContainer, Runtime
 
 RUNTIMES_WITH_ENTRYPOINT = [Runtime.java8.value,
                             Runtime.go1x.value,
-                            Runtime.nodejs.value,
-                            Runtime.nodejs43.value,
-                            Runtime.nodejs610.value,
+                            Runtime.nodejs.value,                            
                             Runtime.nodejs810.value,
                             Runtime.python36.value,
                             Runtime.python27.value]

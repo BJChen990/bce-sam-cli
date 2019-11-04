@@ -116,7 +116,7 @@ class TestSamTemplateValidator(TestCase):
                     "Properties": {
                         "Handler": "index.handler",
                         "CodeUri": "./",
-                        "Runtime": "nodejs6.10",
+                        "Runtime": "nodejs8.5",
                         "Timeout": 60
                     }
                 }
@@ -151,7 +151,7 @@ class TestSamTemplateValidator(TestCase):
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
                         "Handler": "index.handler",
-                        "Runtime": "nodejs6.10",
+                        "Runtime": "nodejs8.5",
                         "Timeout": 60
                     }
                 }
