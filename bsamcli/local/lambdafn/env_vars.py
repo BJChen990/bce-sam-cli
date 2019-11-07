@@ -2,8 +2,8 @@
 Supplies the environment variables necessary to set up Local CFC runtime
 """
 
+import uuid
 import sys
-
 
 class EnvironmentVariables(object):
     """
@@ -156,6 +156,7 @@ class EnvironmentVariables(object):
 
             "_HANDLER": self.handler,
             "_TIMEOUT": self.timeout,
+            "_REQUEST_ID": str(uuid.uuid1())
 
             # Additional variables we don't fill in
             # "BCE_ACCOUNT_ID="

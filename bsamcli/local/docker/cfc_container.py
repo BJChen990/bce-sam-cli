@@ -11,7 +11,10 @@ LOG = logging.getLogger(__name__)
 class Runtime(Enum):
     nodejs85 = "nodejs8.5"
     nodejs611 = "nodejs6.11"
+    nodejs10 = "nodejs10"
+    nodejs12 = "nodejs12"
     python27 = "python2.7"
+    python36 = "python3.6"
     java8 = "java8"
 
     @classmethod
@@ -172,11 +175,11 @@ class CfcContainer(Container):
         # configs from: https://github.com/lambci/docker-lambda
         # to which we add the extra debug mode options
         entrypoint = None
-        if runtime in [Runtime.nodejs85.value, Runtime.nodejs611.value, Runtime.java8.value]:
-            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + [str(debug_port)] + debug_args_list
+        if runtime in [Runtime.nodejs85.value, Runtime.nodejs611.value, Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.java8.value]:
+            entrypoint = ["/var/runtime/bin/entry.sh"] + [str(debug_port)] + debug_args_list
 
-        elif runtime == Runtime.python27.value:
-            entrypoint = ["/var/runtime/bin/start_invoke.sh"] + debug_args_list
+        elif runtime in [Runtime.python27.value, Runtime.python36.value]:
+            entrypoint = ["/var/runtime/bin/entry.sh"] + debug_args_list
 
         # elif runtime == Runtime.go1x.value:
         #     entrypoint = ["/var/runtime/aws-lambda-go"] \

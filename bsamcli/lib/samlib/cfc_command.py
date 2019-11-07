@@ -25,6 +25,7 @@ from bsamcli.lib.samlib.cfc_credential_helper import get_region
 
 from bsamcli.lib.samlib.deploy_context import DeployContext
 from bsamcli.lib.samlib.user_exceptions import DeployContextException
+from bsamcli.local.init import RUNTIME_TEMPLATE_MAPPING
 
 LOG = logging.getLogger(__name__)
 _TEMPLATE_OPTION_DEFAULT_VALUE = "template.yaml"
@@ -101,7 +102,7 @@ def _create_function(cfc_client, function):
 
     try:
         create_response = cfc_client.create_function(function_name,
-                                                 description=function.description or "cfc function from bsam cli",
+                                                 description=function.description or "function created by bsam cli",
                                                  handler=function.handler,
                                                  memory_size=user_memorysize,
                                                  environment=env,
@@ -182,16 +183,11 @@ def _zip_up(code_uri, zipfile_name):
     LOG.info('%s zip suceeded!', zipfile_name)
     z.close()
 
-def _deal_with_func_runtime(function_runtime):
-    if function_runtime in ('python', 'python2', 'python2.7'):
-        return 'python2'
-    if function_runtime in ('nodejs8', 'nodejs8.5'):
-        return 'nodejs8.5'
-    if function_runtime in ('java', 'java8'):
-        return 'java8'
+def _deal_with_func_runtime(func_runtime):
+    if RUNTIME_TEMPLATE_MAPPING[func_runtime] is None:
+        raise UserException("Function runtime not supported")
 
-    raise UserException("Function runtime not supported")
-
+    return RUNTIME_TEMPLATE_MAPPING[func_runtime]
 
 def _create_triggers(cfc_client, function, context):
     func_config = cfc_client.get_function_configuration(function.name)

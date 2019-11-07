@@ -78,7 +78,13 @@ bsam deploy
 
 ## Testing
 
-* [NodeJS 8.10+ installed](https://nodejs.org/en/download/)
+{%- if cookiecutter.runtime == 'nodejs8.5' %}
+* [NodeJS 8.5 installed](https://nodejs.org/en/download/releases/)
+{%- elif cookiecutter.runtime =='nodejs10' %}
+* [NodeJS 10 installed](https://nodejs.org/en/download/releases/)
+{%- else %}
+* [NodeJS 12 installed](https://nodejs.org/en/download/releases/)
+{%- endif %}
 
 We use `mocha` for testing our code and it is already added in `package.json` under `scripts`, so that we can simply run the following command to run our tests:
 

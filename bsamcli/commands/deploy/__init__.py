@@ -25,4 +25,3 @@ def cli(ctx, region):
 def do_cli(region):
     # execute_command("deploy", args)
     execute_deploy_command("deploy", region=region)
-

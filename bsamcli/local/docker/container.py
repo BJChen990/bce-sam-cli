@@ -151,6 +151,8 @@ class Container(object):
 
         self.id = None
 
+    # cfc_container 集成了这个 container 类，调用这个 start 方法启动容器
+    # 这里调用 docker sdk，启动容器
     def start(self, input_data=None):
         """
         Calls Docker API to start the container. The container must be created at the first place to run.

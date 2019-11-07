@@ -59,19 +59,21 @@ Project Status
 -  [ ] Python Versions support
 
    -  [x] Python 2.7
-   -  [x] Python 3.6
+   -  [ ] Python 3.6
 
 -  [ ] Supported AWS Lambda Runtimes
 
    -  [x] ``nodejs``      
-   -  [x] ``nodejs8.10``
+   -  [x] ``nodejs8.5``
+   -  [x] ``nodejs10``
+   -  [x] ``nodejs12``
    -  [x] ``java8``
    -  [x] ``python2.7``
-   -  [x] ``python3.6``
-   -  [x] ``go1.x``
+   -  [ ] ``python3.6``
+   -  [ ] ``go1.x``
    -  [ ] ``dotnetcore1.0``
-   -  [x] ``dotnetcore2.0``
-   -  [x] ``dotnetcore2.1``
+   -  [ ] ``dotnetcore2.0``
+   -  [ ] ``dotnetcore2.1``
 
 -  [x] AWS credential support
 -  [x] Debugging support
@@ -80,13 +82,15 @@ Project Status
 -  [x] Generating boilerplate templates
 
    -  [x] ``nodejs``
-   -  [x] ``nodejs8.10``
+   -  [x] ``nodejs8.5``
+   -  [x] ``nodejs10``
+   -  [x] ``nodejs12``
    -  [x] ``java8``
    -  [x] ``python2.7``
-   -  [x] ``python3.6``
-   -  [x] ``go1.x``
-   -  [x] ``dotnetcore1.0``
-   -  [x] ``dotnetcore2.0``
+   -  [ ] ``python3.6``
+   -  [ ] ``go1.x``
+   -  [ ] ``dotnetcore1.0``
+   -  [ ] ``dotnetcore2.0``
 
 Contributing
 ------------
