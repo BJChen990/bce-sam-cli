@@ -27,6 +27,9 @@ RUNTIME_TEMPLATE_MAPPING = {
     "php": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
     "php7": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
     "php7.2": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
+    "lua": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
+    "lua5": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
+    "lua5.3": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
     "java": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
     "java8": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
 }
