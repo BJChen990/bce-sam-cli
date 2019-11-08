@@ -1,0 +1,20 @@
+BCETemplateFormatVersion: '2010-09-09'
+Transform: BCE::Serverless-2018-08-30
+Description: >
+    {{ cookiecutter.project_name }}
+
+    Sample SAM Template for {{ cookiecutter.project_name }}
+
+
+Resources:
+
+    HelloWorldFunction:
+        Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
+        Properties:
+            CodeUri: hello_world/
+            Handler: index.handler            
+            Runtime: php7.2
+            Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
+                Variables:
+                    PARAM1: VALUE
+                    

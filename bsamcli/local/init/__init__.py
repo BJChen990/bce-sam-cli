@@ -24,6 +24,9 @@ RUNTIME_TEMPLATE_MAPPING = {
     "nodejs8.5": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
     "nodejs10": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
     "nodejs12": os.path.join(_templates, "cookiecutter-aws-sam-hello-nodejs"),
+    "php": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
+    "php7": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
+    "php7.2": os.path.join(_templates, "cookiecutter-aws-sam-hello-php"),
     "java": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
     "java8": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
 }
