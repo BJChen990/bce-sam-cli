@@ -18,6 +18,7 @@ class Runtime(Enum):
     php72 = "php7.2"
     lua53 = "lua5.3"
     java8 = "java8"
+    golang = "golang"
 
     @classmethod
     def has_value(cls, value):

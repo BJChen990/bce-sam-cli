@@ -78,7 +78,7 @@ Next, the following command will use CFC api to create or update function.
 bsam deploy
 ```
 
-> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/QuickGuide.html#BSAM.20CLI.E4.BD.BF.E7.94.A8.E7.A4.BA.E4.BE.8B) for more details in how to get started.**
+> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/s/6jzmfw35p) for more details in how to get started.**
 > **See [Java函数开发指南](https://cloud.baidu.com/doc/CFC/BestPractise.html#Java.E5.87.BD.E6.95.B0.E5.BC.80.E5.8F.91.E6.8C.87.E5.8D.97) for more details about java function.**
 
 ## Testing

@@ -53,7 +53,7 @@ We recommand that you use the BSAM CLI to do install denepdencies.
 
 ## Packaging and deployment
 
-BCE CFC Python runtime requires a flat folder with all dependencies including the application. BSAM will use `CodeUri` property to know where to look up for both application and dependencies:
+BCE CFC Nodejs runtime requires a folder with all dependencies including the application. BSAM will use `CodeUri` property to know where to look up for both application and dependencies:
 
 ```yaml
 ...
@@ -93,4 +93,4 @@ cd hello_world
 npm run test
 ```
 
-> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/QuickGuide.html#BSAM.20CLI.E4.BD.BF.E7.94.A8.E7.A4.BA.E4.BE.8B) for more details in how to get started.**
+> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/s/6jzmfw35p) for more details in how to get started.**

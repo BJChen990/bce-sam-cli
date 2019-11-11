@@ -1,42 +1,22 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+BCETemplateFormatVersion: '2010-09-09'
+Transform: BCE::Serverless-2018-08-30
 Description: >
-  {{ cookiecutter.project_name }}
-  
-  Sample SAM Template for {{ cookiecutter.project_name }}
+    {{ cookiecutter.project_name }}
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-  Function:
-    Timeout: 5
+    Sample SAM Template for {{ cookiecutter.project_name }}
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: hello-world/
-      Handler: hello-world
-      Runtime: go1.x
-      Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
-      Events:
-        CatchAll:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: GET
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
 
-Outputs:
-  HelloWorldAPI:
-    Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-
-  HelloWorldFunction:
-    Description: "First Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    HelloWorldFunction:
+        Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
+        Properties:
+            CodeUri: 
+            Handler: hello_handler
+            Runtime: golang
+            MemorySize: 128
+            Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
+                Variables:
+                    PARAM1: VALUE
+            Events:
+                HelloWorld:
+                    Type: DuerOS

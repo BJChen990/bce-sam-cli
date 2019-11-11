@@ -30,6 +30,8 @@ RUNTIME_TEMPLATE_MAPPING = {
     "lua": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
     "lua5": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
     "lua5.3": os.path.join(_templates, "cookiecutter-aws-sam-hello-lua"),
+    "go": os.path.join(_templates, "cookiecutter-aws-sam-hello-golang"),
+    "golang": os.path.join(_templates, "cookiecutter-aws-sam-hello-golang"),
     "java": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
     "java8": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
 }
