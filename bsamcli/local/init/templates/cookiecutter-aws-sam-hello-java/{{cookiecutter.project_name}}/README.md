@@ -36,7 +36,7 @@ You can run as follows:
 bsam local install
 ```
 
-This step will mount local folder to container, install dependencies and compile application into a JAR file.
+This step will mount local folder to container, use maven to download dependencies and compile application into a JAR file.
 
 
 #### Use mvn
@@ -55,15 +55,15 @@ In order to avoid environmental inconsistencies, we recommand that you use the B
 
 ## Packaging and deployment
 
-BCE CFC Java runtime accepts a standalone JAR file. BSAM will use `CodeUri` property to know where to look up for both application and dependencies:
+BCE CFC Java runtime accepts a standalone JAR file. BSAM will use `CodeUri` property to know the JAR file's location:
 
 ```yaml
 ...
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: target/HelloWorld-1.0.jar
-            Handler: com.helloworld.App
+            CodeUri: target/
+            Handler: com.baidu.demo.SimpleHandler
 ```
 
 Run the following command to package our CFC function to a local zip file:

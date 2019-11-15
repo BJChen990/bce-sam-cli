@@ -1,17 +1,17 @@
 BCETemplateFormatVersion: '2010-09-09'
 Transform: BCE::Serverless-2018-08-30
 Description: >
-    {{ cookiecutter.project_name }}
+    javafunc
 
-    Sample SAM Template for {{ cookiecutter.project_name }}
+    Sample SAM Template for javafunc
 
 Resources:
 
     HelloWorldFunction:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
-            CodeUri: target/HelloWorld-1.0-jar-with-dependencies.jar
-            Handler: helloworld.App
+            CodeUri: target/
+            Handler: com.baidu.demo.SimpleHandler
             Runtime: java8
             MemorySize: 512
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object

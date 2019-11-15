@@ -1,4 +1,4 @@
-package helloworld;
+package com.baidu.demo;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -7,7 +7,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class IndexTest
+public class AppTest 
     extends TestCase
 {
     /**
@@ -15,7 +15,7 @@ public class IndexTest
      *
      * @param testName name of the test case
      */
-    public IndexTest( String testName )
+    public AppTest( String testName )
     {
         super( testName );
     }
@@ -25,13 +25,13 @@ public class IndexTest
      */
     public static Test suite()
     {
-        return new TestSuite( IndexTest.class );
+        return new TestSuite( AppTest.class );
     }
 
     /**
      * Rigourous Test :-)
      */
-    public void testIndex()
+    public void testApp()
     {
         assertTrue( true );
     }
