@@ -19,6 +19,8 @@ class Runtime(Enum):
     lua53 = "lua5.3"
     java8 = "java8"
     golang = "golang"
+    dotnetcore22 = "dotnetcore2.2"
+    powershell62 = "powershell6.2"
 
     @classmethod
     def has_value(cls, value):

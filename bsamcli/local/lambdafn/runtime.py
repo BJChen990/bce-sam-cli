@@ -177,6 +177,9 @@ class CfcRuntime(object):
                 tmp_dir = _get_tmp_dir(code_path)
                 yield tmp_dir
 
+            elif function_config.runtime == "dotnetcore2.2":
+                yield os.path.join(code_path, "bin", "Release", "netcoreapp2.2", "publish/")
+
             else:
                 LOG.debug("Code %s is not a jar file", code_path)
                 yield code_path

@@ -34,6 +34,10 @@ RUNTIME_TEMPLATE_MAPPING = {
     "golang": os.path.join(_templates, "cookiecutter-aws-sam-hello-golang"),
     "java": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
     "java8": os.path.join(_templates, "cookiecutter-aws-sam-hello-java"),
+    "dotnetcore": os.path.join(_templates, "cookiecutter-aws-sam-hello-dotnet"),
+    "dotnetcore2.2": os.path.join(_templates, "cookiecutter-aws-sam-hello-dotnet"),
+    "powershell": os.path.join(_templates, "cookiecutter-aws-sam-hello-powershell"),    
+    "powershell6.2": os.path.join(_templates, "cookiecutter-aws-sam-hello-powershell"),
 }
 
 def generate_project(
