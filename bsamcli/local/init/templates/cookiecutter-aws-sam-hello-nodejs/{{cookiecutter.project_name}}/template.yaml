@@ -15,6 +15,8 @@ Resources:
             Handler: index.handler
             {%- if cookiecutter.runtime == 'nodejs8.5' %}
             Runtime: nodejs8.5
+            {%- elif cookiecutter.runtime == 'nodejs8' %}
+            Runtime: nodejs8.5
             {%- elif cookiecutter.runtime == 'nodejs10' %}
             Runtime: nodejs10
             {%- else %}

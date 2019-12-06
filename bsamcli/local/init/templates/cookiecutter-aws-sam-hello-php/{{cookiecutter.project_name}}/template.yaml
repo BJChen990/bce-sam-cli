@@ -13,7 +13,7 @@ Resources:
         Properties:
             CodeUri: hello_world/
             Handler: index.handler            
-            Runtime: php7.2
+            Runtime: php7
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE

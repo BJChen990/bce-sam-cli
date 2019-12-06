@@ -25,7 +25,7 @@ from bsamcli.lib.samlib.cfc_credential_helper import get_region
 
 from bsamcli.lib.samlib.deploy_context import DeployContext
 from bsamcli.lib.samlib.user_exceptions import DeployContextException
-from bsamcli.local.init import RUNTIME_TEMPLATE_MAPPING
+from bsamcli.local.docker.cfc_container import Runtime
 
 LOG = logging.getLogger(__name__)
 _TEMPLATE_OPTION_DEFAULT_VALUE = "template.yaml"
@@ -39,7 +39,8 @@ def execute_pkg_command(command):
                            log_file=None,
                            ) as context:
             for f in context.all_functions:
-                _zip_up(f.codeuri, f.name)
+                codeuri = warp_codeuri(f)
+                _zip_up(codeuri, f.name)
     except FunctionNotFound:
         raise UserException("Function not found in template")
     except InvalidSamDocumentException as ex:
@@ -116,7 +117,7 @@ def _create_function(cfc_client, function):
         LOG.info("Function Create Response: %s", str(create_response))
 
     except(BceServerError, BceHttpClientError) as e:
-        if e.last_error.message == "Forbidden":
+        if e.last_error.status_code == 403:
             LOG.info("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
         else:
             raise UserException(str(e))
@@ -146,7 +147,7 @@ def _update_function(cfc_client, function):
 
 
     except(BceServerError, BceHttpClientError) as e:
-        if e.last_error.message == "Forbidden":
+        if e.last_error.status_code == 403:
             LOG.info("Probably invalid AK/SK , check out ~/.bce/credential to find out...")
         else:
             raise UserException(str(e))
@@ -184,10 +185,14 @@ def _zip_up(code_uri, zipfile_name):
     z.close()
 
 def _deal_with_func_runtime(func_runtime):
-    if RUNTIME_TEMPLATE_MAPPING[func_runtime] is None:
-        raise UserException("Function runtime not supported")
+    if func_runtime == "python2.7":
+        return "python2"
+    if func_runtime == "python3.6":
+        return "python3"
 
-    return RUNTIME_TEMPLATE_MAPPING[func_runtime]
+    if not Runtime.has_value(func_runtime):
+        raise ValueError("Unsupported CFC runtime {}".format(func_runtime))
+    return func_runtime
 
 def _create_triggers(cfc_client, function, context):
     func_config = cfc_client.get_function_configuration(function.name)
@@ -197,3 +202,10 @@ def _create_triggers(cfc_client, function, context):
         context.deploy(cfc_client, func_config)
     except(BceServerError, BceHttpClientError) as e:
         raise UserException(str(e))
+
+def warp_codeuri(f):
+    LOG.debug("f.runtime is: %s", f.runtime)
+    if f.runtime == "dotnetcore2.2":
+        new_uri = os.path.join(f.codeuri, "bin", "Release", "netcoreapp2.2", "publish/")
+        return new_uri
+    return f.codeuri

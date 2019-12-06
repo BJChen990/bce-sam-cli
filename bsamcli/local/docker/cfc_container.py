@@ -15,7 +15,7 @@ class Runtime(Enum):
     nodejs12 = "nodejs12"
     python27 = "python2.7"
     python36 = "python3.6"
-    php72 = "php7.2"
+    php72 = "php7"
     lua53 = "lua5.3"
     java8 = "java8"
     golang = "golang"

@@ -1,40 +1,27 @@
 # {{ cookiecutter.project_name }}
 
-This is a sample template for {{ cookiecutter.project_name }} - Below is a brief explanation of what we have generated for you:
+本项目是 {{ cookiecutter.project_name }} 的示例模板，项目结构如下：
 
 ```bash
 .
-├── README.md                   <-- This instructions file
-├── hello_world                 <-- Source code for a cfc function
-│   ├── index.lua               <-- CFC function code
-│   └── hello_world.rockspec    <-- Lua dependencies   
-└── template.yaml               <-- BCE SAM template
+├── README.md
+├── hello_world                 <-- 源文件文件夹，存放函数源码和依赖库
+│   ├── index.lua               <-- lua 源码文件
+│   └── hello_world.rockspec    <-- lua 包管理文件
+└── template.yaml               <-- BSAM 模型文件
 ```
 
-## Requirements
+## 使用前提
 
-* BCE CLI already configured with at least PowerUser permission
-* [Docker installed](https://www.docker.com/community-edition)
+* BSAM CLI 已成功安装
+* [Docker 已成功安装](https://www.docker.com/community-edition)
 
-## Setup process
+## 函数依赖安装
 
-### Installing dependencies
+CFC 执行函数不仅需要函数源码，也需要函数的依赖库。因此，在执行函数前，您需要先安装函数依赖库。对 lua 函数来说，您有两种安装方式。
 
-BCE CFC requires a flat folder with the application as well as its dependencies. Therefore, we need to have a process in order to enable local testing as well as packaging/deployment later on. There are two ways you can install dependencies.
-
-#### Use BSAM install command
-You can run as follows:
-
-```
-bsam local install
-```
-
-This step will mount local folder to container, and install our dependencies into the function code folder automaticlly.
-
-
-#### Use luarocks
-
-You can use luarocks or other tools to manage dependencies, you can also put your personal library in the folder.
+#### 使用 luarocks
+您可以使用 luarocks 或其它工具自行安装依赖库，或者把您个人的 lua 库放到代码所在目录中，比如：
 
 ```bash
 cd hello_world
@@ -42,15 +29,47 @@ luarocks make hello_world.rockspec
 cd ../
 ```
 
-We recommand that you use the BSAM CLI to do install denepdencies.
+### 使用 BSAM 命令
+若您的环境缺少相关工具，您可使用 BSAM 内置的功能安装依赖，执行如下命令:
 
-**NOTE:** As you change your application code as well as dependencies during development you'll need to make sure these steps are repeated in order to execute your CFC.
+```
+bsam local install
+```
 
-**BSAM CLI** is used to emulate CFC locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.)
+BSAM 会把项目路径挂载到 Docker 容器中，并在容器中使用 luarocks 自动安装依赖库到函数代码所在目录。
 
-## Packaging and deployment
+## 生成触发器 event
 
-BCE CFC Python runtime requires a flat folder with all dependencies including the application. BSAM will use `CodeUri` property to know where to look up for both application and dependencies:
+若您的函数会被触发器调用，您可以给函数传入该触发器的事件，以验证函数对 event 的处理。执行如下命令获取某个特定事件的 event:
+
+```
+bsam local generate-event dueros intent-answer
+```
+
+更多 event 可执行如下命令查看：
+
+```
+bsam local generate-event -h
+```
+
+## 函数执行
+
+BSAM CLI 使用 `template.yaml` 获取函数的运行时、源码文件路径等信息，从而得知如何执行函数。您可以使用以下方式执行函数:
+
+```
+# 输出 json 字符串作为 event 重定向给函数
+echo '{"foo": "bar"}' | bsam local invoke HelloWorldFunction
+
+# 把 json 文件内容作为 event 重定向给函数，并跳过检查远程镜像更新和拉取
+cat event.json | bsam local invoke --skip-pull-image HelloWorldFunction
+
+# 不传 event 给函数
+bsam local invoke HelloWorldFunction --no-event --skip-pull-image
+```
+
+## 函数打包与部署
+
+CFC lua 函数执行时需要相关的依赖库文件，所以您需要将依赖库文件与函数源文件一起打包部署。BSAM 根据 `CodeUri` 参数获取这些文件所在路径。
 
 ```yaml
 ...
@@ -61,16 +80,16 @@ BCE CFC Python runtime requires a flat folder with all dependencies including th
             ...
 ```
 
-Next, run the following command to package function to a local zip file:
+执行如下命令会把 `CodeUri` 目录下的文件打成 zip 包：
 
 ```bash
 bsam package
 ```
 
-Next, the following command will use CFC api to create or update function.
+接下来，您可以使用 `deploy` 命令把函数创建或更新到云端。
 
 ```bash
 bsam deploy
 ```
 
-> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/s/6jzmfw35p) for more details in how to get started.**
+> **关于 BSAM CLI 的更多用法，请查看该文档 https://cloud.baidu.com/doc/CFC/s/6jzmfw35p**

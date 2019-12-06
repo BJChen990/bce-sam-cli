@@ -1,94 +1,107 @@
 # {{ cookiecutter.project_name }}
 
-This is a sample template for {{ cookiecutter.project_name }} - Below is a brief explanation of what we have generated for you:
+本项目是 {{ cookiecutter.project_name }} 的示例模板，项目结构如下：
 
 ```bash
 .
-├── README.md                               <-- This instructions file
-├── pom.xml                                 <-- Java dependencies
-├── src
-│   ├── main
-│   │   └── java
-│   │       └── helloworld                  <-- Source code for a CFC function
-│   │           └── Index.java              <-- CFC function code
-│   └── test                                <-- Unit tests
-│       └── java
-│           └── helloworld
-│               └── IndexTest.java
-└── template.yaml
+├── README.md
+├── pom.xml                                     <-- Java 依赖管理文件
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── baidu
+    │               └── demo
+    │                   ├── App.java            <-- main 函数
+    │                   └── SimpleHandler.java  <-- 用户函数入口
+    └── test
+        └── java
+            └── com
+                └── baidu
+                    └── demo
+                        └── AppTest.java        <-- 测试文件
+└── template.yaml                               <-- BSAM 模型文件
 ```
 
-## Requirements
+## 使用前提
 
-* BCE SAM CLI already configured with at least PowerUser permission
-* [Docker installed](https://www.docker.com/community-edition)
+* BSAM CLI 已成功安装
+* [Docker 已成功安装](https://www.docker.com/community-edition)
 
-## Setup process
+## 函数依赖安装
 
-### Installing dependencies and compile
+CFC 执行 Java 函数需要将函数提前编译成可执行文件。对 Java 函数来说，您有两种编译方式。
 
-BCE CFC requires a flat folder with the application as well as its dependencies. Therefore, we need to have a process in order to enable local testing as well as packaging/deployment later on. There are two ways you can install dependencies.
+#### 手动下载依赖并编译
 
-#### Use BSAM install command
-You can run as follows:
-
-```
-bsam local install
-```
-
-This step will mount local folder to container, use maven to download dependencies and compile application into a JAR file.
-
-
-#### Use mvn
-
-You can use maven or other tools to manage dependencies.
+以本模板项目为例，您可执行如下命令：
 
 ```bash
 mvn package
 ```
 
-In order to avoid environmental inconsistencies, we recommand that you use the BSAM CLI to install and compile.
+#### 使用 BSAM 命令
 
-**NOTE:** As you change your application code as well as dependencies during development you'll need to make sure these steps are repeated in order to execute your CFC.
+若您的环境缺少相关工具，您可使用 BSAM 内置的功能安装依赖，执行如下命令:
 
-**BSAM CLI** is used to emulate CFC locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.)
+```
+bsam local install
+```
 
-## Packaging and deployment
+BSAM 会把项目路径挂载到 Docker 容器中，并在容器中使用 maven 自动下载依赖并执行 mvn package。
 
-BCE CFC Java runtime accepts a standalone JAR file. BSAM will use `CodeUri` property to know the JAR file's location:
+## 生成触发器 event
+若您的函数会被触发器调用，您可以给函数传入该触发器的事件，以验证函数对 event 的处理。执行如下命令获取某个特定事件的 event:
+
+```
+bsam local generate-event dueros intent-answer
+```
+
+更多 event 可执行如下命令查看：
+
+```
+bsam local generate-event -h
+```
+
+## 函数执行 
+
+BSAM CLI 使用 `template.yaml` 获取函数的运行时、源码文件路径等信息，从而得知如何执行函数。您可以使用以下方式执行函数:
+
+```
+# 输出 json 字符串作为 event 重定向给函数
+echo '{"foo": "bar"}' | bsam local invoke HelloWorldFunction
+
+# 把 json 文件内容作为 event 重定向给函数，并跳过检查远程镜像更新和拉取
+cat event.json | bsam local invoke --skip-pull-image HelloWorldFunction
+
+# 不传 event 给函数
+bsam local invoke HelloWorldFunction --no-event --skip-pull-image
+```
+
+## 函数打包与部署
+
+BSAM 根据 `CodeUri` 参数获取要部署的文件的路径。
 
 ```yaml
 ...
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: target/
-            Handler: com.baidu.demo.SimpleHandler
+            CodeUri: target/HelloWorld-1.0-jar-with-dependencies.jar
+            ...
 ```
 
-Run the following command to package our CFC function to a local zip file:
+执行如下命令会把 `CodeUri` 指定的 jar 包打包成 zip 文件：
 
 ```bash
 bsam package
 ```
 
-Next, the following command will use CFC api to create or update function.
+接下来，您可以使用 `deploy` 命令把函数创建或更新到云端。
 
 ```bash
 bsam deploy
 ```
 
-> **See [How to use BSAM CLI](https://cloud.baidu.com/doc/CFC/s/6jzmfw35p) for more details in how to get started.**
-> **See [Java函数开发指南](https://cloud.baidu.com/doc/CFC/BestPractise.html#Java.E5.87.BD.E6.95.B0.E5.BC.80.E5.8F.91.E6.8C.87.E5.8D.97) for more details about java function.**
-
-## Testing
-### Requirements
-Testing is not yet integrated into BSAM CLI, so you need to configure the environment before testing.
-* [Maven installed](https://maven.apache.org/download.cgi)
-* [JDK installed](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-
-We use `JUnit` for testing our code and you can simply run the following command to run our tests:
-
-```bash
-mvn test
-```
+> **关于 BSAM CLI 的更多用法，请查看该文档 https://cloud.baidu.com/doc/CFC/s/6jzmfw35p**
+> **关于 Java 函数更多用法，请查看文档 https://cloud.baidu.com/doc/CFC/s/mjxtzor5t**

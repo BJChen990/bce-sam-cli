@@ -10,7 +10,7 @@ Resources:
     HelloWorldFunction:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
-            CodeUri: 
+            CodeUri: hello_world/
             Handler: hello_handler
             Runtime: golang
             MemorySize: 128
