@@ -81,7 +81,7 @@ class ContainerManager(object):
         """
         # TODO 从baidu内部的registry下载镜像，docker pull myregistry.local:5000/testing/test-image
 
-        stream = stream or sys.stderr
+        stream = stream or sys.stdout
         try:
             result_itr = self.docker_client.api.pull(image_name, stream=True, decode=True)
         except docker.errors.ImageNotFound as ex:

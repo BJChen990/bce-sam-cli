@@ -3,6 +3,7 @@ Entry point for the CLI
 """
 
 import logging
+import sys
 import click
 
 from bsamcli import __version__
@@ -11,7 +12,7 @@ from .context import Context
 from .command import BaseCommand
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
 
 pass_context = click.make_pass_decorator(Context)

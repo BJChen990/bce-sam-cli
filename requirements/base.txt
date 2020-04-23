@@ -1,9 +1,9 @@
 six~=1.11.0
-click~=6.7
+click~=7.1.1
 enum34~=1.1.6
 Flask~=1.0.2
 boto3~=1.5
-PyYAML~=3.12
+PyYAML~=5.1
 cookiecutter~=1.6.0
 bce-sam-translator==0.0.1
 docker>=3.3.0
