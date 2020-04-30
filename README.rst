@@ -63,8 +63,7 @@ Project Status
 
 -  [ ] Supported AWS Lambda Runtimes
 
-   -  [x] ``nodejs``      
-   -  [x] ``nodejs8.5``
+   -  [x] ``nodejs``         
    -  [x] ``nodejs10``
    -  [x] ``nodejs12``
    -  [x] ``java8``
@@ -82,7 +81,6 @@ Project Status
 -  [x] Generating boilerplate templates
 
    -  [x] ``nodejs``
-   -  [x] ``nodejs8.5``
    -  [x] ``nodejs10``
    -  [x] ``nodejs12``
    -  [x] ``java8``

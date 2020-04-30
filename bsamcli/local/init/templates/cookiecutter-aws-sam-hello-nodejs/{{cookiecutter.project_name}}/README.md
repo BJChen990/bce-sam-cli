@@ -98,9 +98,7 @@ bsam deploy
 
 ## 测试
 
-{%- if cookiecutter.runtime == 'nodejs8.5' %}
-* [NodeJS 8.5 installed](https://nodejs.org/en/download/releases/)
-{%- elif cookiecutter.runtime =='nodejs10' %}
+{%- if cookiecutter.runtime == 'nodejs10' %}
 * [NodeJS 10 installed](https://nodejs.org/en/download/releases/)
 {%- else %}
 * [NodeJS 12 installed](https://nodejs.org/en/download/releases/)

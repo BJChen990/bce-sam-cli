@@ -7,16 +7,13 @@ Description: >
 
 Resources:
 
-    HelloWorldFunction:
+    {{ cookiecutter.project_name }}:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
             CodeUri: hello_world/
-            Handler: hello_handler
+            Handler: index
             Runtime: golang
             MemorySize: 128
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE
-            Events:
-                HelloWorld:
-                    Type: DuerOS

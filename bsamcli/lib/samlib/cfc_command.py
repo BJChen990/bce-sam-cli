@@ -185,11 +185,6 @@ def _zip_up(code_uri, zipfile_name):
     z.close()
 
 def _deal_with_func_runtime(func_runtime):
-    if func_runtime == "python2.7":
-        return "python2"
-    if func_runtime == "python3.6":
-        return "python3"
-
     if not Runtime.has_value(func_runtime):
         raise ValueError("Unsupported CFC runtime {}".format(func_runtime))
     return func_runtime

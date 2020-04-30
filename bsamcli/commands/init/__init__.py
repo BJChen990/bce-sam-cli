@@ -17,10 +17,10 @@ SUPPORTED_RUNTIME = [r for r in RUNTIME_TEMPLATE_MAPPING]
 
 @click.command(context_settings=dict(help_option_names=[u'-h', u'--help']))
 @click.option('-l', '--location', help="Template location (git, mercurial, http(s), zip, path)")
-@click.option('-r', '--runtime', type=click.Choice(SUPPORTED_RUNTIME), default="nodejs8.5",
+@click.option('-r', '--runtime', type=click.Choice(SUPPORTED_RUNTIME), default="nodejs10",
               help="CFC Runtime of your app")
 @click.option('-o', '--output-dir', default='.', type=click.Path(), help="Where to output the initialized app into")
-@click.option('-n', '--name', default="bsam-app", help="Name of your project to be generated as a folder")
+@click.option('-n', '--name', default="bsam-app", help="Name of your function and your project to be generated as a folder")
 @click.option('--no-input', is_flag=True, default=False,
               help="Disable prompting and accept default values defined template config")
 @common_options

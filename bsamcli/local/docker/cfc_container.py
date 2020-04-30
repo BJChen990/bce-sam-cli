@@ -9,12 +9,10 @@ from .container import Container
 LOG = logging.getLogger(__name__)
 
 class Runtime(Enum):
-    nodejs85 = "nodejs8.5"
-    nodejs611 = "nodejs6.11"
     nodejs10 = "nodejs10"
     nodejs12 = "nodejs12"
-    python27 = "python2.7"
-    python36 = "python3.6"
+    python27 = "python2"
+    python36 = "python3"
     php72 = "php7"
     lua53 = "lua5.3"
     java8 = "java8"
@@ -78,10 +76,9 @@ class CfcContainer(Container):
         entry = CfcContainer._get_entry_point(runtime, debug_options)
         additional_options = CfcContainer._get_additional_options(runtime, debug_options)
         additional_volumes = CfcContainer._get_additional_volumes(debug_options)
-        cmd = [handler]
 
         super(CfcContainer, self).__init__(image,
-                                              cmd,
+                                              None,
                                               self._WORKING_DIR,
                                               code_dir,
                                               memory_limit_mb=memory_mb,
@@ -180,11 +177,12 @@ class CfcContainer(Container):
         # configs from: https://github.com/lambci/docker-lambda
         # to which we add the extra debug mode options
         entrypoint = None
-        if runtime in [Runtime.nodejs85.value, Runtime.nodejs611.value, Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.java8.value]:
-            entrypoint = ["/var/runtime/bin/entry.sh"] + [str(debug_port)] + debug_args_list
+        if runtime in [Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.java8.value]:
+            entrypoint = ["/bin/bash", "/var/runtime/bin/entry.sh"] + [str(debug_port)] + debug_args_list
+            print("debug entrypoint is:", entrypoint)
 
         elif runtime in [Runtime.python27.value, Runtime.python36.value]:
-            entrypoint = ["/var/runtime/bin/entry.sh"] + debug_args_list
+            entrypoint = ["/bin/bash", "/var/runtime/bin/entry.sh"] + debug_args_list
 
         # elif runtime == Runtime.go1x.value:
         #     entrypoint = ["/var/runtime/aws-lambda-go"] \

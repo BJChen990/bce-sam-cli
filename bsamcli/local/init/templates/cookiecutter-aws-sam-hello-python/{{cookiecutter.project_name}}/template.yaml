@@ -8,19 +8,18 @@ Description: >
 
 Resources:
 
-    HelloWorldFunction:
+    {{ cookiecutter.project_name }}:
         Type: BCE::Serverless::Function # More info about Function Resource: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md
         Properties:
             CodeUri: hello_world/
             Handler: index.handler
             {%- if cookiecutter.runtime == 'python3' %}
-            Runtime: python3.6
+            Runtime: python3
             {%- elif cookiecutter.runtime == 'python3.6' %}
-            Runtime: python3.6
+            Runtime: python3
             {%- else %}
-            Runtime: python2.7
+            Runtime: python2
             {%- endif %}
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE
-                    

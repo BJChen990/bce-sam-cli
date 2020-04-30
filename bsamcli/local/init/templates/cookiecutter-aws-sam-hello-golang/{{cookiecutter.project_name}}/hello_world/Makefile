@@ -4,7 +4,7 @@ deps:
 	go mod tidy
 
 clean: 
-	rm -rf ./hello_world
+	rm -rf ./index
 	
 build:
-	GOOS=linux GOARCH=amd64 go build -o hello_world
+	GOOS=linux GOARCH=amd64 go build -o index
