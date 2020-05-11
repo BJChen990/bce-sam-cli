@@ -14,14 +14,15 @@ import json
 
 from baidubce.services.cfc.cfc_client import CfcClient
 from baidubce.services.bos.bos_client import BosClient
+from baidubce.bce_client_configuration import BceClientConfiguration
 from baidubce.exception import BceServerError
 from baidubce.exception import BceHttpClientError
-from bsamcli.lib.samlib.cfc_deploy_conf import get_config
 
 from bsamcli.commands.exceptions import UserException
 from bsamcli.local.lambdafn.exceptions import FunctionNotFound
 from bsamcli.commands.validate.lib.exceptions import InvalidSamDocumentException
-from bsamcli.lib.samlib.cfc_credential_helper import get_region
+from bsamcli.lib.samlib.cfc_credential_helper import get_credentials, get_region
+from bsamcli.lib.samlib.cfc_deploy_conf import get_region_endpoint
 
 from bsamcli.lib.samlib.deploy_context import DeployContext
 from bsamcli.lib.samlib.user_exceptions import DeployContextException
@@ -40,14 +41,14 @@ def execute_pkg_command(command):
                            ) as context:
             for f in context.all_functions:
                 codeuri = warp_codeuri(f)
-                _zip_up(codeuri, f.name)
+                zip_up(codeuri, f.name)
     except FunctionNotFound:
         raise UserException("Function not found in template")
     except InvalidSamDocumentException as ex:
         raise UserException(str(ex))
 
 
-def execute_deploy_command(command, region=None):
+def execute_deploy_command(command, region=None, endpoint=None):
     LOG.debug("%s command is called", command)
     try:
         with DeployContext(template_file=_TEMPLATE_OPTION_DEFAULT_VALUE,
@@ -56,45 +57,50 @@ def execute_deploy_command(command, region=None):
                            log_file=None,
                            ) as context:
             for f in context.all_functions:
-                _do_deploy(context, f, region)
+                do_deploy(context, f, region, endpoint)
 
     except FunctionNotFound:
         raise UserException("Function not found in template")
     except InvalidSamDocumentException as ex:
         raise UserException(str(ex))
 
-def _do_deploy(context, function, region):
+def do_deploy(context, function, region, endpoint_input):
     # create a cfc client
-    cfc_client = CfcClient(get_config(region))
-    existed = _check_if_exist(cfc_client, function.name)
-    if existed:
-        _update_function(cfc_client, function)
+
+    client_endpoint = None
+    if endpoint_input is not None:
+        client_endpoint = endpoint_input
     else:
-        _create_function(cfc_client, function)
-        _create_triggers(cfc_client, function, context)
-    LOG.info("deploy done.")
+        client_endpoint = get_region_endpoint(region)    
+
+    cfc_client = CfcClient(BceClientConfiguration(credentials=get_credentials(), endpoint=client_endpoint))
+    existed = check_if_exist(cfc_client, function.name)
+    if existed:
+        update_function(cfc_client, function)
+    else:
+        create_function(cfc_client, function)
+        create_triggers(cfc_client, function, context)
+
+    LOG.info("Funtion %s deploy done." % function.name)
 
 
-def _check_if_exist(cfc_client, function_name):
+def check_if_exist(cfc_client, function_name):
     try:
         get_function_response = cfc_client.get_function(function_name)
         LOG.debug("[Sample CFC] get_function response:%s", get_function_response)
     except (BceServerError, BceHttpClientError): # TODO 区分一下具体的异常，因为可能是响应超时,input out put 一致
         return False
 
-    # if (get_function_response.FunctionName == None or get_function_response.FunctionName != function_name):
-        # return False
-
     return True
 
 
-def _create_function(cfc_client, function):
+def create_function(cfc_client, function):
     # create a cfc function
     function_name = function.name
-    base64_file = _get_function_base64_file(function_name)
+    base64_file = get_function_base64_file(function_name)
     user_memorysize = function.memory or 128
     user_timeout = function.timeout or 3
-    user_runtime = _deal_with_func_runtime(function.runtime)
+    user_runtime = deal_with_func_runtime(function.runtime)
     user_region = get_region()
 
     env = function.environment
@@ -123,14 +129,14 @@ def _create_function(cfc_client, function):
             raise UserException(str(e))
 
 
-def _update_function(cfc_client, function):
+def update_function(cfc_client, function):
     # update function code and configuration
     function_name = function.name
-    base64_file = _get_function_base64_file(function_name)
+    base64_file = get_function_base64_file(function_name)
     try:
         cfc_client.update_function_code(function.name, zip_file=base64_file)
 
-        LOG.info("function code updated")
+        LOG.info("Function %s code updated." % function.name)
 
         env = function.environment
         if env is not None:
@@ -139,11 +145,11 @@ def _update_function(cfc_client, function):
         cfc_client.update_function_configuration(function.name,
                                             environment=env,
                                             handler=function.handler,
-                                            run_time=_deal_with_func_runtime(function.runtime),
+                                            run_time=deal_with_func_runtime(function.runtime),
                                             timeout=function.timeout,
                                             description=function.description)
 
-        LOG.info("function configuration updated")
+        LOG.info("Function %s configuration updated." % function.name)
 
 
     except(BceServerError, BceHttpClientError) as e:
@@ -153,7 +159,7 @@ def _update_function(cfc_client, function):
             raise UserException(str(e))
 
 
-def _get_function_base64_file(function_name):
+def get_function_base64_file(function_name):
     zipfile_name = function_name + '.zip'
     if not os.path.exists(zipfile_name):
         raise DeployContextException("Zip file not found : {}".format(zipfile_name))
@@ -165,7 +171,7 @@ def _get_function_base64_file(function_name):
             raise DeployContextException("Failed to convert zipfile to base64: {}".format(str(ex)))
 
 
-def _zip_up(code_uri, zipfile_name):
+def zip_up(code_uri, zipfile_name):
     if code_uri is None:
         raise DeployContextException("Missing the file or the directory to zip up : {} is not valid".format(code_uri))
 
@@ -184,12 +190,12 @@ def _zip_up(code_uri, zipfile_name):
     LOG.info('%s zip suceeded!', zipfile_name)
     z.close()
 
-def _deal_with_func_runtime(func_runtime):
+def deal_with_func_runtime(func_runtime):
     if not Runtime.has_value(func_runtime):
         raise ValueError("Unsupported CFC runtime {}".format(func_runtime))
     return func_runtime
 
-def _create_triggers(cfc_client, function, context):
+def create_triggers(cfc_client, function, context):
     func_config = cfc_client.get_function_configuration(function.name)
     LOG.debug("get function ret is: %s", func_config)
 

@@ -4,9 +4,9 @@ BCE configuration for deployment
 
 import logging
 
-from baidubce.bce_client_configuration import BceClientConfiguration
 from baidubce.auth.bce_credentials import BceCredentials
 
+from bsamcli.lib.samlib.user_exceptions import DeployContextException
 from bsamcli.yamlhelper import yaml_parse
 from bsamcli.lib.samlib.cfc_credential_helper import get_credentials, get_region
 
@@ -19,12 +19,12 @@ endpointMap = {
     "su": "http://cfc.su.baidubce.com",
 }
 
-def get_config(region):
+def get_region_endpoint(region):
     region = region or get_region()
     if region is None:
         LOG.info("using default region: bj")
         region = "bj"
     elif region not in SUPPORTED_REGION:
-        LOG.info("unsupported region: %s", region)
+        raise DeployContextException("Region is not supported: {}".format(region))
 
-    return BceClientConfiguration(credentials=get_credentials(), endpoint=endpointMap.get(region))
+    return endpointMap.get(region)
