@@ -4,6 +4,7 @@ Interaction of credential input
 
 import os
 import configparser
+import logging
 
 from baidubce.auth.bce_credentials import BceCredentials
 from bsamcli.commands.exceptions import UserException
@@ -20,12 +21,15 @@ ACCESS_KEY_OPTION_NAME = "bce_access_key_id"
 SECRET_KEY_OPTION_NAME = "bce_secret_access_key"
 BCE_SESSION_TOKEN = "bce_session_token"
 
+LOG = logging.getLogger(__name__)
+
 def get_credentials():
     """
     get credential from default location
     """
     if not os.path.exists(default_credential_file):
-        raise UserException("credential file not found : {} does not exist, try sam config".format(default_credential_file))
+        LOG.debug("credential file not found: %s does not exist, try execute 'sam config' later" % format(default_credential_file))
+        return BceCredentials('test-ak', 'test-sk')
     #生成config对象
     safe_config_json = {ACCESS_KEY_OPTION_NAME: "", SECRET_KEY_OPTION_NAME: "", BCE_SESSION_TOKEN: ""}
     conf = configparser.SafeConfigParser(safe_config_json)
@@ -42,7 +46,8 @@ def get_region():
     get region from default configfile
     """
     if not os.path.exists(default_credential_file):
-        raise UserException("credential file not found : {} does not exist, try sam config".format(default_config_file))
+        LOG.debug("config file not found : {} does not exist, try 'sam config' later".format(default_config_file))
+        return DEFAULT_REGION
     #生成config对象
     conf = configparser.SafeConfigParser({"region": DEFAULT_REGION})
     #用config对象读取配置文件
