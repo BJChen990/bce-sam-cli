@@ -6,7 +6,7 @@
 .
 ├── README.md
 ├── hello-world                 <-- 源文件文件夹，存放函数源码和依赖库
-│   ├── hello_world.go          <-- golang 函数源码
+│   ├── index.go                <-- golang 函数源码
 │   ├── main.go                 <-- golang 函数源码
 │   ├── go.mod                  <-- go mod 依赖管理
 │   ├── go.sum                  <-- go mod 依赖管理
@@ -30,7 +30,7 @@ CFC 执行 Golang 函数需要将函数提前编译成可执行文件。对 Gola
 ```bash
 cd hello_world
 go mod tidy
-GOOS=linux GOARCH=amd64 go build -o hello_world
+GOOS=linux GOARCH=amd64 go build -o index
 cd ..
 ```
 
@@ -71,6 +71,16 @@ cat event.json | bsam local invoke --skip-pull-image HelloWorldFunction
 
 # 不传 event 给函数
 bsam local invoke HelloWorldFunction --no-event --skip-pull-image
+```
+
+若您在 windows 系统中使用 bsam，请尽量使用 bootstrap 文件，在其中自定义如何执行您的函数，比如
+
+```
+#!/bin/bash
+
+ExecStart=(
+    ./index
+)
 ```
 
 ## 函数打包与部署

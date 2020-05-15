@@ -39,7 +39,7 @@ def aws_creds_options(f):
 
 @click.command(cls=BaseCommand)
 @common_options
-@click.version_option(version=__version__, prog_name="SAM CLI")
+@click.version_option(version=__version__, prog_name="BCE SAM CLI")
 @pass_context
 def cli(ctx):
     """
