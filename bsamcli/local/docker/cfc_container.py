@@ -8,6 +8,7 @@ from .container import Container
 
 LOG = logging.getLogger(__name__)
 
+
 class Runtime(Enum):
     nodejs10 = "nodejs10"
     nodejs12 = "nodejs12"
@@ -38,7 +39,7 @@ class CfcContainer(Container):
     is provided by the base class
     """
 
-    _IMAGE_REPO_NAME = "bceci/cfc"
+    _IMAGE_REPO_NAME = "registry.baidubce.com/cfc-public/runtime"
 
     _WORKING_DIR = "/var/task"
 
@@ -78,15 +79,15 @@ class CfcContainer(Container):
         additional_volumes = CfcContainer._get_additional_volumes(debug_options)
 
         super(CfcContainer, self).__init__(image,
-                                              None,
-                                              self._WORKING_DIR,
-                                              code_dir,
-                                              memory_limit_mb=memory_mb,
-                                              exposed_ports=ports,
-                                              entrypoint=entry,
-                                              env_vars=env_vars,
-                                              container_opts=additional_options,
-                                              additional_volumes=additional_volumes)
+                                           None,
+                                           self._WORKING_DIR,
+                                           code_dir,
+                                           memory_limit_mb=memory_mb,
+                                           exposed_ports=ports,
+                                           entrypoint=entry,
+                                           env_vars=env_vars,
+                                           container_opts=additional_options,
+                                           additional_volumes=additional_volumes)
 
     @staticmethod
     def _get_exposed_ports(debug_options):
@@ -177,12 +178,8 @@ class CfcContainer(Container):
         # configs from: https://github.com/lambci/docker-lambda
         # to which we add the extra debug mode options
         entrypoint = None
-        if runtime in [Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.java8.value]:
+        if runtime in [Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.python27.value, Runtime.python36.value, Runtime.java8.value]:
             entrypoint = ["/bin/bash", "/var/runtime/bin/entry.sh"] + [str(debug_port)] + debug_args_list
-            print("debug entrypoint is:", entrypoint)
-
-        elif runtime in [Runtime.python27.value, Runtime.python36.value]:
-            entrypoint = ["/bin/bash", "/var/runtime/bin/entry.sh"] + debug_args_list
 
         # elif runtime == Runtime.go1x.value:
         #     entrypoint = ["/var/runtime/aws-lambda-go"] \
@@ -192,13 +189,5 @@ class CfcContainer(Container):
         #             "-delvePort=" + str(debug_port),
         #             "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
         #           ]
-
-        # elif runtime == Runtime.python36.value:
-
-        #     entrypoint = ["/var/lang/bin/python3.6"] \
-        #            + debug_args_list \
-        #            + [
-        #                "/var/runtime/awslambda/bootstrap.py"
-        #            ]
 
         return entrypoint
