@@ -5,7 +5,7 @@
 ```bash
 .
 ├── README.md
-├── hello_world
+├── src
 │   ├── InvokeEvent.cs      <-- event 定义文件
 │   ├── Program.cs          <-- 程序 main 入口
 │   ├── StreamHandler.cs    <-- 用户函数入口
@@ -27,7 +27,7 @@ CFC 执行 csharp 函数需要将函数提前编译成可执行文件，您有�
 以本模板项目为例，您可执行如下命令：
 
 ```bash
-cd hello_world
+cd src
 dotnet publish -c Release
 cd ..
 ```
@@ -79,7 +79,7 @@ bsam local invoke HelloWorldFunction --no-event --skip-pull-image
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: hello_world/
+            CodeUri: src/
             Handler: bsam_csharp::BaiduBce.CFC.Demo.StreamHandlerDemo
             ...
 ```

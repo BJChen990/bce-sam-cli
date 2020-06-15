@@ -5,7 +5,7 @@
 ```bash
 .
 ├── README.md
-├── hello-world                 <-- 源文件文件夹，存放函数源码和依赖库
+├── src                         <-- 源文件文件夹，存放函数源码和依赖库
 │   ├── index.go                <-- golang 函数源码
 │   ├── main.go                 <-- golang 函数源码
 │   ├── go.mod                  <-- go mod 依赖管理
@@ -28,7 +28,7 @@ CFC 执行 Golang 函数需要将函数提前编译成可执行文件。对 Gola
 以本模板项目为例，您可执行如下命令：
 
 ```bash
-cd hello_world
+cd src
 go mod tidy
 GOOS=linux GOARCH=amd64 go build -o index
 cd ..
@@ -92,7 +92,7 @@ BSAM 根据 `CodeUri` 参数获取要部署的文件的路径。
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: hello_world/
+            CodeUri: src/
             ...
 ```
 

@@ -5,9 +5,9 @@
 ```bash
 .
 ├── README.md
-├── hello_world                 <-- 源文件文件夹，存放函数源码和依赖库
+├── src                         <-- 源文件文件夹，存放函数源码和依赖库
 │   ├── index.lua               <-- lua 源码文件
-│   └── hello_world.rockspec    <-- lua 包管理文件
+│   └── index.rockspec          <-- lua 包管理文件
 └── template.yaml               <-- BSAM 模型文件
 ```
 
@@ -24,8 +24,8 @@ CFC 执行函数不仅需要函数源码，也需要函数的依赖库。因此�
 您可以使用 luarocks 或其它工具自行安装依赖库，或者把您个人的 lua 库放到代码所在目录中，比如：
 
 ```bash
-cd hello_world
-luarocks make hello_world.rockspec
+cd src
+luarocks make index.rockspec
 cd ../
 ```
 
@@ -76,7 +76,7 @@ CFC lua 函数执行时需要相关的依赖库文件，所以您需要将依赖
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: hello_world/
+            CodeUri: src/
             ...
 ```
 

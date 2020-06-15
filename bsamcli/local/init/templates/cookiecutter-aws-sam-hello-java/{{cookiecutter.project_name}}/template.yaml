@@ -14,6 +14,7 @@ Resources:
             Handler: com.baidu.demo.SimpleHandler
             Runtime: java8
             MemorySize: 512
+            Timeout: 10
             Environment: # More info about Env Vars: https://github.com/bcelabs/serverless-application-model/blob/bsam_alpha/versions/2018-08-30.md#environment-object
                 Variables:
                     PARAM1: VALUE

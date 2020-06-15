@@ -5,7 +5,7 @@
 ```bash
 .
 ├── README.md
-├── hello_world                 <-- 源文件文件夹，存放函数源码和依赖库
+├── src                         <-- 源文件文件夹，存放函数源码和依赖库
 │   ├── __init__.py
 │   ├── index.py                <-- python 函数源码
 │   └── requirements.txt        <-- Python 依赖管理文件
@@ -30,7 +30,7 @@ CFC 执行函数不仅需要函数源码，也需要函数的依赖库。因此�
 您可以使用 pip 或其它工具自行安装依赖库，或者把您个人的 python 库放到代码所在目录中，比如：
 
 ```bash
-pip install -r hello_world/requirements.txt -t hello_world/
+pip install -r src/requirements.txt -t src/
 ```
 
 ### 使用 BSAM 命令
@@ -80,7 +80,7 @@ CFC Python 函数执行时需要相关的依赖库文件，所以您需要将依
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: hello_world/
+            CodeUri: src/
             ...
 ```
 

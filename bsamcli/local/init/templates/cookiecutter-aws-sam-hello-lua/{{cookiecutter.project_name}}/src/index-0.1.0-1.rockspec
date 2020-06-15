@@ -1,4 +1,4 @@
-package ="hello_world"
+package ="index"
 version ="0.1.0-1"
 source = {
    url = "https://github.com/bcelabs/bce-sam-cli"
@@ -18,6 +18,6 @@ dependencies ={
 build ={
     type = "builtin",
     modules = {
-        ["bsam.hello_world"] = "index.lua",
+        ["bsam.index"] = "index.lua",
     }
 }

@@ -5,7 +5,7 @@
 ```bash
 .
 ├── README.md
-├── hello_world                 <-- 存放函数相关源文件的文件夹
+├── src                         <-- 存放函数相关源文件的文件夹
 │   └── index.ps1               <-- Powershell 函数源文件
 └── template.yaml               <-- BSAM 模型文件
 ```
@@ -52,7 +52,7 @@ BSAM 根据 `CodeUri` 参数获取函数文件所在路径。
     HelloWorldFunction:
         Type: BCE::Serverless::Function
         Properties:
-            CodeUri: hello_world/
+            CodeUri: src/
             ...
 ```
 
