@@ -6,7 +6,7 @@ import os
 import configparser
 import logging
 
-from baidubce.auth.bce_credentials import BceCredentials
+from bsamcli.lib.baidubce.auth.bce_credentials import BceCredentials
 from bsamcli.commands.exceptions import UserException
 
 default_config_location = os.path.expanduser('~') + os.sep + ".bce"
@@ -23,19 +23,21 @@ BCE_SESSION_TOKEN = "bce_session_token"
 
 LOG = logging.getLogger(__name__)
 
+
 def get_credentials():
     """
     get credential from default location
     """
     if not os.path.exists(default_credential_file):
-        LOG.debug("credential file not found: %s does not exist, try execute 'sam config' later" % format(default_credential_file))
+        LOG.debug("credential file not found: %s does not exist, try execute 'sam config' later" %
+                  format(default_credential_file))
         return BceCredentials('test-ak', 'test-sk')
-    #生成config对象
+    # 生成config对象
     safe_config_json = {ACCESS_KEY_OPTION_NAME: "", SECRET_KEY_OPTION_NAME: "", BCE_SESSION_TOKEN: ""}
     conf = configparser.SafeConfigParser(safe_config_json)
-    #用config对象读取配置文件
+    # 用config对象读取配置文件
     conf.read(default_credential_file)
-    #指定section，option读取值
+    # 指定section，option读取值
     ak = conf.get(CREDENTIAL_SECTION_NAME, ACCESS_KEY_OPTION_NAME)
     sk = conf.get(CREDENTIAL_SECTION_NAME, SECRET_KEY_OPTION_NAME)
     return BceCredentials(ak, sk)
@@ -48,12 +50,13 @@ def get_region():
     if not os.path.exists(default_credential_file):
         LOG.debug("config file not found : {} does not exist, try 'sam config' later".format(default_config_file))
         return DEFAULT_REGION
-    #生成config对象
+    # 生成config对象
     conf = configparser.SafeConfigParser({"region": DEFAULT_REGION})
-    #用config对象读取配置文件
+    # 用config对象读取配置文件
     conf.read(default_config_file)
-    #指定section，option读取值
+    # 指定section，option读取值
     return conf.get(CONFIG_SECTION_NAME, "region")
+
 
 def init_conf_folder(config_folder):
     """
@@ -74,6 +77,7 @@ def init_conf_folder(config_folder):
         os.mkdir(config_folder)
         __init_credential_config(credential_path)
         __init_cfc_config(config_path)
+
 
 def config_interactive(config_folder, ak="", sk="", region=""):
     if not config_folder:

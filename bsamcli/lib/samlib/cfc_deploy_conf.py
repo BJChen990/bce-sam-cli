@@ -4,7 +4,7 @@ BCE configuration for deployment
 
 import logging
 
-from baidubce.auth.bce_credentials import BceCredentials
+from bsamcli.lib.baidubce.auth.bce_credentials import BceCredentials
 
 from bsamcli.lib.samlib.user_exceptions import DeployContextException
 from bsamcli.yamlhelper import yaml_parse
@@ -18,6 +18,7 @@ endpointMap = {
     "gz": "http://cfc.gz.baidubce.com",
     "su": "http://cfc.su.baidubce.com",
 }
+
 
 def get_region_endpoint(region):
     region = region or get_region()
