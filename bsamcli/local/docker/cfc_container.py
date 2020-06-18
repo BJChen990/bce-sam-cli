@@ -3,6 +3,7 @@ Represents Cfc runtime containers.
 """
 
 import logging
+import os
 from enum import Enum
 from .container import Container
 
@@ -47,6 +48,8 @@ class CfcContainer(Container):
     _DEBUGGER_VOLUME_MOUNT_PATH = "/tmp/lambdaci_debug_files"
     _DEFAULT_CONTAINER_DBG_GO_PATH = _DEBUGGER_VOLUME_MOUNT_PATH + "/dlv"
 
+    _DEFAULT_CONTAINER_EVENT_PATH = "/tmp/event"
+
     # This is the dictionary that represents where the debugger_path arg is mounted in docker to as readonly.
     _DEBUGGER_VOLUME_MOUNT = {"bind": _DEBUGGER_VOLUME_MOUNT_PATH, "mode": "ro"}
 
@@ -56,6 +59,7 @@ class CfcContainer(Container):
                  code_dir,
                  memory_mb=128,
                  env_vars=None,
+                 event_path=None,
                  debug_options=None):
         """
         Initializes the class
@@ -76,7 +80,7 @@ class CfcContainer(Container):
         ports = CfcContainer._get_exposed_ports(debug_options)
         entry = CfcContainer._get_entry_point(runtime, debug_options)
         additional_options = CfcContainer._get_additional_options(runtime, debug_options)
-        additional_volumes = CfcContainer._get_additional_volumes(debug_options)
+        additional_volumes = CfcContainer._get_additional_volumes(event_path, debug_options)
 
         super(CfcContainer, self).__init__(image,
                                            None,
@@ -129,19 +133,29 @@ class CfcContainer(Container):
         return opts
 
     @staticmethod
-    def _get_additional_volumes(debug_options):
+    def _get_additional_volumes(event_path, debug_options):
         """
         Return additional volumes to be mounted in the Docker container. Used by container debug for mapping
         debugger executable into the container.
+        :param string event_path: the event file path on host.
         :param DebugContext debug_options: DebugContext for the runtime of the container.
         :return dict: Dictionary containing volume map passed to container creation.
         """
-        if not debug_options or not debug_options.debugger_path:
-            return None
 
-        return {
-            debug_options.debugger_path: CfcContainer._DEBUGGER_VOLUME_MOUNT
-        }
+        ret = {}
+        if debug_options and debug_options.debugger_path:
+            ret[debug_options.debugger_path] = {
+                "bind": CfcContainer._DEBUGGER_VOLUME_MOUNT,
+                "mode": "rw"
+            }
+
+        if event_path:
+            ret[os.path.dirname(event_path)] = {
+                "bind": CfcContainer._DEFAULT_CONTAINER_EVENT_PATH,
+                "mode": "rw"
+            }
+
+        return ret
 
     @staticmethod
     def _get_image(runtime):

@@ -46,11 +46,11 @@ def cli(ctx, function_identifier, template, event, no_event, env_vars, debug_por
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
     do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
-        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
+           debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region)  # pragma: no cover
 
 
 def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
-        debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
+           debug_args, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region):
     """
     Implementation of the ``cli`` method, just separated out for unit testing purposes
     """

@@ -5,6 +5,7 @@ Supplies the environment variables necessary to set up Local CFC runtime
 import uuid
 import sys
 
+
 class EnvironmentVariables(object):
     """
     Use this class to get the environment variables necessary to run the CFC function. It returns the BCE specific
@@ -102,12 +103,6 @@ class EnvironmentVariables(object):
             result[name] = self._stringify_value(value)
 
         return result
-
-    def add_cfc_event_body(self, value):
-        """
-        Adds the value of BCE_CFC_EVENT_BODY environment variable.
-        """
-        self.variables["BCE_EVENT_BODY"] = value
 
     def add_install_flag(self):
         self.variables["IS_INSTALLING"] = "True"

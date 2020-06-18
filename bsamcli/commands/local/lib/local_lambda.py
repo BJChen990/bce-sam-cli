@@ -81,7 +81,8 @@ class LocalLambdaRunner(object):
         config = self._get_invoke_config(function)
 
         # Invoke the function
-        self.local_runtime.invoke(config, self.cwd, event, debug_context=self.debug_context, is_installing=is_installing, stdout=stdout, stderr=stderr)
+        self.local_runtime.invoke(config, self.cwd, event, debug_context=self.debug_context,
+                                  is_installing=is_installing, stdout=stdout, stderr=stderr)
 
     def is_debugging(self):
         """

@@ -64,18 +64,19 @@ class CfcRuntime(object):
 
         # Update with event input
         environ = function_config.env_vars
-        environ.add_cfc_event_body(event)
         if is_installing:
             environ.add_install_flag()
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
         with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
+            event_path = _create_tmp_event_file(event)
             container = CfcContainer(function_config.runtime,
-                                        function_config.handler,
-                                        code_dir,
-                                        memory_mb=function_config.memory,
-                                        env_vars=env_vars,
-                                        debug_options=debug_context)
+                                     function_config.handler,
+                                     code_dir,
+                                     memory_mb=function_config.memory,
+                                     env_vars=env_vars,
+                                     event_path=event_path,
+                                     debug_options=debug_context)
 
             try:
 
@@ -111,6 +112,7 @@ class CfcRuntime(object):
                 # If we are in debugging mode, timer would not be created. So skip cleanup of the timer
                 if timer:
                     timer.cancel()
+                os.unlink(event_path)
                 self._container_manager.stop(container)
 
     def _configure_interrupt(self, function_name, timeout, container, is_debugging, is_installing):
@@ -186,6 +188,32 @@ class CfcRuntime(object):
         finally:
             if tmp_dir:
                 shutil.rmtree(tmp_dir)
+
+
+def _create_tmp_event_file(event_data):
+    """
+    Create a temporary event file to from the string event data. If no file is provided, read the event from stdin.
+
+    :param string event_data: event string
+    :return string: full path of the temporary event file
+    """
+
+    dir_prefix = None
+
+    import platform
+    if platform.system().lower() != "windows":
+        dir_prefix = "/tmp/"
+
+    tmp_dir = tempfile.mkdtemp(prefix=dir_prefix)
+    event = os.path.join(tmp_dir, "event.json")
+
+    LOG.info("Writing event to a temporary file %s", event)
+
+    with open(event, 'w') as f:
+        f.write(event_data)
+
+    return event
+
 
 def _get_tmp_dir(filepath):
     """
