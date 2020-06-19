@@ -62,15 +62,17 @@ class CfcRuntime(object):
         :raises Keyboard
         """
         timer = None
+        event_path = None
 
         # Update with event input
         environ = function_config.env_vars
         if is_installing:
             environ.add_install_flag()
+        else:
+            event_path = _create_tmp_event_file(event)
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
         with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
-            event_path = _create_tmp_event_file(event)
             container = CfcContainer(function_config.runtime,
                                      function_config.handler,
                                      code_dir,
@@ -113,7 +115,8 @@ class CfcRuntime(object):
                 # If we are in debugging mode, timer would not be created. So skip cleanup of the timer
                 if timer:
                     timer.cancel()
-                os.unlink(event_path)
+                if event_path:
+                    os.unlink(event_path)
                 self._container_manager.stop(container)
 
     def _configure_interrupt(self, function_name, timeout, container, is_debugging, is_installing):
@@ -366,7 +369,7 @@ def _create_tmp_event_file(event_data):
     tmp_dir = tempfile.mkdtemp(prefix=dir_prefix)
     event = os.path.join(tmp_dir, "event.json")
 
-    LOG.info("Writing event to a temporary file %s", event)
+    LOG.debug("Writing event to a temporary file %s", event)
 
     with open(event, 'w') as f:
         f.write(event_data)
