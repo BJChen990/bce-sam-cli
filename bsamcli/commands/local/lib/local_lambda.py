@@ -201,13 +201,17 @@ class LocalLambdaRunner(object):
              this returns None
         """
 
-        result = {}
-        bce_credentials = get_credentials()
-        if bce_credentials.access_key_id != "":
-            result["key"] = bce_credentials.access_key_id
+        result = {
+            "key": "root",
+            "secret": "root",
+            "token": "mock-sts-token"
+        }
+        # bce_credentials = get_credentials()
+        # if bce_credentials.access_key_id != "":
+        #     result["key"] = bce_credentials.access_key_id
 
-        if bce_credentials.secret_access_key != "":
-            result["secret"] = bce_credentials.secret_access_key
+        # if bce_credentials.secret_access_key != "":
+        #     result["secret"] = bce_credentials.secret_access_key
 
         # if bce_credentials.session_token != "" :
         #     result["token"] = bce_credentials.session_token

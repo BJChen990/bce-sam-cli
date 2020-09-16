@@ -34,7 +34,7 @@ if os.getenv("BSAM_CLI_DEV"):
     cmd_name = "bsamdev"
 
 setup(
-    name='bce-sam-cli',
+    name='bce-sam-cli-private',
     version=read_version(),
     description='BCE SAM CLI is a CLI tool for local development and testing of Serverless applications',
     long_description=read("README.md"),

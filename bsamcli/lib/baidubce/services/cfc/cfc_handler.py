@@ -36,7 +36,7 @@ def parse_json(http_response, response):
     """
     body = http_response.read()
     if body:
-        response.__dict__.update(json.loads(body, object_hook=dict_to_python_object).__dict__)
+        response.__dict__.update(json.loads(body.decode('utf-8'), object_hook=dict_to_python_object).__dict__)
     http_response.close()
     return True
 
@@ -63,7 +63,7 @@ def parse_error(http_response, response):
     bse = None
     body = http_response.read()
     if body:
-        d = json.loads(body)
+        d = json.loads(body.decode('utf-8'))
         if 'code' in d:
             bse = BceServerError(d['message'], code=d['code'], request_id=d['requestId'])
         else:

@@ -28,6 +28,8 @@ def get_credentials():
     """
     get credential from default location
     """
+    return BceCredentials('root', 'root')
+
     if not os.path.exists(default_credential_file):
         LOG.debug("credential file not found: %s does not exist, try execute 'sam config' later" %
                   format(default_credential_file))

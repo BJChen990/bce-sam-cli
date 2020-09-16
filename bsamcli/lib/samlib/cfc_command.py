@@ -74,7 +74,8 @@ def do_deploy(context, function, region, endpoint_input):
     else:
         client_endpoint = get_region_endpoint(region)
 
-    cfc_client = CfcClient(BceClientConfiguration(credentials=get_credentials(), endpoint=client_endpoint))
+    cfc_client = CfcClient(BceClientConfiguration(credentials=get_credentials(), endpoint=client_endpoint,
+                                                  security_token="mock-sts-token"))
     existed = check_if_exist(cfc_client, function.name)
     if existed:
         update_function(cfc_client, function)

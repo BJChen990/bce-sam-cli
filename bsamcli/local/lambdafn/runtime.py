@@ -4,6 +4,7 @@ Classes representing a local CFC runtime
 
 import os
 import shutil
+import subprocess
 import tempfile
 import signal
 import logging
@@ -11,7 +12,7 @@ import threading
 import json
 from contextlib import contextmanager
 
-from bsamcli.local.docker.cfc_container import CfcContainer
+from bsamcli.local.docker.cfc_container import CfcContainer, Runtime
 from .zip import unzip
 
 LOG = logging.getLogger(__name__)
@@ -171,7 +172,7 @@ class CfcRuntime(object):
         try:
             if is_installing:
                 if function_config.runtime == "java8":
-                    yield cwd          # where template.yaml is
+                    yield cwd  # where template.yaml is
                 else:
                     yield code_path
 
@@ -188,6 +189,114 @@ class CfcRuntime(object):
         finally:
             if tmp_dir:
                 shutil.rmtree(tmp_dir)
+
+
+class CfcRuntimeNative(CfcRuntime):
+    RUNTIME_DIR = "/var/runtime"
+    BSAM_ENTRY = "/var/bsam"
+
+    def __init__(self, container_manager=None):
+        super(CfcRuntimeNative, self).__init__(container_manager)
+
+    def invoke(self,
+               function_config,
+               cwd,
+               event,
+               debug_context=None,
+               is_installing=None,
+               stdout=None,
+               stderr=None):
+        """
+        Invoke the given CFC function locally.
+
+        ##### NOTE: THIS IS A LONG BLOCKING CALL #####
+        This method will block until either the CFC function completes or timed out, which could be seconds.
+        A blocking call will block the thread preventing any other operations from happening. If you are using this
+        method in a web-server or in contexts where your application needs to be responsive when function is running,
+        take care to invoke the function in a separate thread. Co-Routines or micro-threads might not perform well
+        because the underlying implementation essentially blocks on a socket, which is synchronous.
+
+        :param FunctionConfig function_config: Configuration of the function to invoke
+        :param event: String input event passed to CFC function
+        :param DebugContext debug_context: Debugging context for the function (includes port, args, and path)
+        :param io.IOBase stdout: Optional. IO Stream to that receives stdout text from container.
+        :param io.IOBase stderr: Optional. IO Stream that receives stderr text from container
+        :raises Keyboard
+        """
+        environ = function_config.env_vars
+        if is_installing:
+            environ.add_install_flag()
+        # Generate a dictionary of environment variable key:values
+        env_vars = environ.resolve()
+        env_vars["_FUNC_NAME"] = function_config.name
+        entry = CfcRuntimeNative._get_entry_point(function_config.runtime, debug_context)
+        with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
+            event_path = _create_tmp_event_file(event)
+            env_vars["_FUNC_EVENT"] = event_path
+            env_vars["_TIMEOUT"] = str(env_vars["_TIMEOUT"])
+            try:
+                ret = subprocess.run(entry,
+                                     timeout=function_config.timeout,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE,
+                                     env=env_vars)
+
+                if stdout is not None:
+                    stdout.write(ret.stdout)
+
+                if stderr is not None:
+                    stderr.write(ret.stderr)
+
+            except subprocess.TimeoutExpired as err:
+                LOG.info("invocation timeout")
+
+                if stdout is not None and err.stdout is not None:
+                    stdout.write(err.stdout)
+
+                if stderr is not None and err.stderr is not None:
+                    stderr.write(err.stderr)
+
+
+    @staticmethod
+    def _get_entry_point(runtime, debug_options=None):
+        """
+        Returns the entry point for the container. The default value for the entry point is already configured in the
+        Dockerfile. We override this default specifically when enabling debugging. The overridden entry point includes
+        a few extra flags to start the runtime in debug mode.
+
+        :param string runtime: CFC function runtime name
+        :param int debug_port: Optional, port for debugger
+        :param string debug_args: Optional additional arguments passed to the entry point.
+        :return list: List containing the new entry points. Each element in the list is one portion of the command.
+            ie. if command is ``node index.js arg1 arg2``, then this list will be ["node", "index.js", "arg1", "arg2"]
+        """
+
+        entry_base = ["/bin/bash", "/var/bsam/" + runtime + "/entry.sh"]
+        if not debug_options:
+            return entry_base + ["normal"]
+
+        debug_port = debug_options.debug_port
+        debug_args_list = []
+        if debug_options.debug_args:
+            debug_args_list = debug_options.debug_args.split(" ")
+
+        # configs from: https://github.com/lambci/docker-lambda
+        # to which we add the extra debug mode options
+        entrypoint = None
+        if runtime in [Runtime.nodejs10.value, Runtime.nodejs12.value, Runtime.python27.value, Runtime.python36.value,
+                       Runtime.java8.value]:
+            entrypoint = entry_base + [str(debug_port)] + debug_args_list
+
+        # elif runtime == Runtime.go1x.value:
+        #     entrypoint = ["/var/runtime/aws-lambda-go"] \
+        #         + debug_args_list \
+        #         + [
+        #             "-debug=true",
+        #             "-delvePort=" + str(debug_port),
+        #             "-delvePath=" + CfcContainer._DEFAULT_CONTAINER_DBG_GO_PATH,
+        #           ]
+
+        return entrypoint
 
 
 def _create_tmp_event_file(event_data):

@@ -30,7 +30,7 @@ class ContainerManager(object):
 
         self.skip_pull_image = skip_pull_image
         self.docker_network_id = docker_network_id
-        self.docker_client = docker_client or docker.from_env()
+        #self.docker_client = docker_client or docker.from_env()
 
     def run(self, container, is_installing=None, input_data=None, warm=False):
         """
