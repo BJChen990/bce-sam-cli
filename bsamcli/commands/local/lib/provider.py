@@ -6,7 +6,7 @@ source
 from collections import namedtuple
 
 # Named Tuple to representing the properties of a Lambda Function
-Function = namedtuple("Function", [
+_Function = namedtuple("Function", [
     # Function name or logical ID
     "name",
 
@@ -34,8 +34,20 @@ Function = namedtuple("Function", [
 
     # Lambda Execution IAM Role ARN. In the future, this can be used by Local Lambda runtime to assume the IAM role
     # to get credentials to run the container with. This gives a much higher fidelity simulation of cloud Lambda.
-    "rolearn"
+    "rolearn",
+
+    # Metadata
+    "metadata",
 ])
+
+
+class Function(_Function):
+    @property
+    def workspace_id(self):
+        if self.metadata is None:
+            return None
+        wid = self.metadata.get('bce:cfc:workspace', None)
+        return wid
 
 
 class FunctionProvider(object):
@@ -81,7 +93,7 @@ _ApiTuple = namedtuple("Api", [
     "binary_media_types"
 ])
 _ApiTuple.__new__.__defaults__ = (None,  # Cors is optional and defaults to None
-                                  []     # binary_media_types is optional and defaults to empty
+                                  []  # binary_media_types is optional and defaults to empty
                                   )
 
 
@@ -106,6 +118,7 @@ class ApiProvider(object):
         :yields Api: namedtuple containing the API information
         """
         raise NotImplementedError("not implemented")
+
 
 BosEvent = namedtuple("BosEvent", [
 

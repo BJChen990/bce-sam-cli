@@ -47,6 +47,7 @@ class CfcClient(bce_base_client.BceBaseClient):
     CdnClient
     """
     prefix = '/v1'
+    workspace_header = b'X-CFC-Workspace-Id'
 
     def __init__(self, config=None):
         bce_base_client.BceBaseClient.__init__(self, config)
@@ -136,7 +137,7 @@ class CfcClient(bce_base_client.BceBaseClient):
     def create_function(self, function_name, description=None, environment=None,
                         handler=None, memory_size=128, region='bj',
                         zip_file=None, publish=False, run_time='python2',
-                        timeout=3, dry_run=False, code_zip_file=None, config=None):
+                        timeout=3, dry_run=False, code_zip_file=None, workspace=None, config=None):
         """
         Create cfc function
 
@@ -208,11 +209,15 @@ class CfcClient(bce_base_client.BceBaseClient):
         else:
             data['Code']['ZipFile'] = zip_file
         params = {}
+        headers = {}
+        if workspace is not None:
+            headers[self.workspace_header] = workspace
         return self._send_request(
             http_methods.POST,
             '/functions',
             body=json.dumps(data),
             params=params,
+            headers=headers,
             config=config)
 
     def list_functions(self, function_version=None, page=None, page_size=None,
@@ -259,7 +264,7 @@ class CfcClient(bce_base_client.BceBaseClient):
             params=params,
             config=config)
 
-    def get_function(self, function_name, qualifier=None, config=None):
+    def get_function(self, function_name, workspace=None, qualifier=None, config=None):
         """
         get function
 
@@ -283,11 +288,15 @@ class CfcClient(bce_base_client.BceBaseClient):
         params = {}
         if qualifier is not None:
             params["Qualifier"] = qualifier
+        headers = {}
+        if workspace is not None:
+            headers[self.workspace_header] = workspace
         return self._send_request(
             http_methods.GET,
             '/functions/' + function_name,
             body={},
             params=params,
+            headers=headers,
             config=config)
 
     def delete_function(self, function_name, qualifier=None, config=None):
@@ -322,7 +331,7 @@ class CfcClient(bce_base_client.BceBaseClient):
             config=config)
 
     def update_function_code(self, function_name, zip_file=None,
-                             publish=None, dry_run=None, config=None):
+                             publish=None, dry_run=None, workspace=None, config=None):
         """
         update_function_code
 
@@ -360,15 +369,18 @@ class CfcClient(bce_base_client.BceBaseClient):
             body["Publish"] = publish
         if dry_run is not None:
             body["DryRun"] = dry_run
-
+        headers = {}
+        if workspace is not None:
+            headers[self.workspace_header] = workspace
         return self._send_request(
             http_methods.PUT,
             '/functions/' + function_name + '/code',
             body=json.dumps(body),
             params={},
+            headers=headers,
             config=config)
 
-    def get_function_configuration(self, function_name, qualifier=None, config=None):
+    def get_function_configuration(self, function_name, workspace=None, qualifier=None, config=None):
         """
         get_function_configuration
         :param function_name  (required) The cfc function name. You can specify a function name (function_name)
@@ -391,17 +403,20 @@ class CfcClient(bce_base_client.BceBaseClient):
         params = {}
         if qualifier is not None:
             params["Qualifier"] = qualifier
-
+        headers = {}
+        if workspace is not None:
+            headers[self.workspace_header] = workspace
         return self._send_request(
             http_methods.GET,
             '/functions/' + function_name + "/configuration",
             body={},
             params={},
+            headers=headers,
             config=config)
 
     def update_function_configuration(self, function_name, description=None, environment=None,
                                       handler=None, run_time=None,
-                                      timeout=None, config=None):
+                                      timeout=None, workspace=None, config=None):
         """
         update_function_configuration
         :param function_name  (required)
@@ -439,11 +454,16 @@ class CfcClient(bce_base_client.BceBaseClient):
             data["Runtime"] = run_time
         if timeout is not None:
             data["Timeout"] = timeout
+        headers = {}
+        if workspace is not None:
+            headers[self.workspace_header] = workspace
+
         return self._send_request(
             http_methods.PUT,
             '/functions/' + function_name + '/configuration',
             body=json.dumps(data),
             params={},
+            headers=headers,
             config=config)
 
     def list_versions_by_function(self, function_name, marker=None, max_items=None, config=None):
@@ -962,8 +982,8 @@ class CfcClient(bce_base_client.BceBaseClient):
         if hasattr(body, "tell") and hasattr(body, "seek"):
             offset = body.tell()
 
-        protocol, host, port = utils.parse_host_port(config.endpoint, config.protocol)
-        path = quote(path)
+        protocol, host, port, endpoint_path = utils.parse_host_port_path(config.endpoint, config.protocol)
+        path = quote(endpoint_path + path)
 
         headers[http_headers.HOST] = host
         if port != config.protocol.default_port:

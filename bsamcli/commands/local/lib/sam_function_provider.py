@@ -130,5 +130,6 @@ class SamFunctionProvider(FunctionProvider):
             description=resource_properties.get("Description"),
             codeuri=codeuri,
             environment=resource_properties.get("Environment"),
-            rolearn=resource_properties.get("Role")
+            rolearn=resource_properties.get("Role"),
+            metadata=resource_properties.get("Metadata"),
         )

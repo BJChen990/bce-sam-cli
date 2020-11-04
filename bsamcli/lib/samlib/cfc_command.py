@@ -76,7 +76,7 @@ def do_deploy(context, function, region, endpoint_input):
 
     cfc_client = CfcClient(BceClientConfiguration(credentials=get_credentials(), endpoint=client_endpoint,
                                                   security_token="mock-sts-token"))
-    existed = check_if_exist(cfc_client, function.name)
+    existed = check_if_exist(cfc_client, function)
     if existed:
         update_function(cfc_client, function)
     else:
@@ -86,9 +86,11 @@ def do_deploy(context, function, region, endpoint_input):
     LOG.info("Funtion %s deploy done." % function.name)
 
 
-def check_if_exist(cfc_client, function_name):
+def check_if_exist(cfc_client, function):
+    function_name = function.name
+    workspace_id = function.workspace_id
     try:
-        get_function_response = cfc_client.get_function(function_name)
+        get_function_response = cfc_client.get_function(function_name, workspace=workspace_id)
         LOG.debug("[Sample CFC] get_function response:%s", get_function_response)
     except (BceServerError, BceHttpClientError):  # TODO 区分一下具体的异常，因为可能是响应超时,input out put 一致
         LOG.debug("[Sample CFC] get_function exceptioned")
@@ -121,7 +123,8 @@ def create_function(cfc_client, function):
                                                      publish=False,
                                                      run_time=user_runtime,
                                                      timeout=user_timeout,
-                                                     dry_run=False)
+                                                     dry_run=False,
+                                                     workspace=function.workspace_id)
         LOG.debug("[Sample CFC] create_response:%s", create_response)
         LOG.info("Function Create Response: %s", str(create_response))
 
@@ -137,7 +140,7 @@ def update_function(cfc_client, function):
     function_name = function.name
     base64_file = get_function_base64_file(function_name)
     try:
-        cfc_client.update_function_code(function.name, zip_file=base64_file)
+        cfc_client.update_function_code(function.name, workspace=function.workspace_id, zip_file=base64_file)
 
         LOG.info("Function %s code updated." % function.name)
 
@@ -145,12 +148,10 @@ def update_function(cfc_client, function):
         if env is not None:
             env = env.get("Variables", None)
 
-        cfc_client.update_function_configuration(function.name,
-                                                 environment=env,
+        cfc_client.update_function_configuration(function.name, description=function.description, environment=env,
                                                  handler=function.handler,
                                                  run_time=deal_with_func_runtime(function.runtime),
-                                                 timeout=function.timeout,
-                                                 description=function.description)
+                                                 timeout=function.timeout, workspace=function.workspace_id)
 
         LOG.info("Function %s configuration updated." % function.name)
 
@@ -200,7 +201,7 @@ def deal_with_func_runtime(func_runtime):
 
 
 def create_triggers(cfc_client, function, context):
-    func_config = cfc_client.get_function_configuration(function.name)
+    func_config = cfc_client.get_function_configuration(function.name, workspace=function.workspace_id)
     LOG.debug("get function ret is: %s", func_config)
 
     try:

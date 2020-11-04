@@ -230,31 +230,81 @@ class CfcRuntimeNative(CfcRuntime):
         env_vars = environ.resolve()
         env_vars["_FUNC_NAME"] = function_config.name
         entry = CfcRuntimeNative._get_entry_point(function_config.runtime, debug_context)
+        timer = None
+
         with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
             event_path = _create_tmp_event_file(event)
             env_vars["_FUNC_EVENT"] = event_path
             env_vars["_TIMEOUT"] = str(env_vars["_TIMEOUT"])
             try:
-                ret = subprocess.run(entry,
-                                     timeout=function_config.timeout,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE,
-                                     env=env_vars)
+                process = subprocess.Popen(entry,
+                                           stdout=subprocess.PIPE,
+                                           stderr=subprocess.STDOUT,
+                                           env=env_vars)
 
-                if stdout is not None:
-                    stdout.write(ret.stdout)
+                timer = self._configure_interrupt(function_config.name,
+                                                  function_config.timeout,
+                                                  process,
+                                                  bool(debug_context),
+                                                  is_installing)
 
-                if stderr is not None:
-                    stderr.write(ret.stderr)
+                while True:
+                    if process.poll() is not None:
+                        break
+                    output = process.stdout.readline()
+                    if output == '':
+                        break
+                    if output and stdout is not None:
+                        stdout.write(output)
+                        stdout.flush()
 
-            except subprocess.TimeoutExpired as err:
-                LOG.info("invocation timeout")
+            except Exception as err:
+                LOG.info("invocation error")
 
                 if stdout is not None and err.stdout is not None:
                     stdout.write(err.stdout)
 
                 if stderr is not None and err.stderr is not None:
                     stderr.write(err.stderr)
+
+            finally:
+                if timer:
+                    timer.cancel()
+                os.unlink(event_path)
+                process.terminate()
+
+    def _configure_interrupt(self, function_name, timeout, process, is_debugging, is_installing):
+        """
+        When a CFC function is executing, we setup certain interrupt handlers to stop the execution.
+        Usually, we setup a function timeout interrupt to kill the container after timeout expires. If debugging though,
+        we don't enforce a timeout. But we setup a SIGINT interrupt to catch Ctrl+C and terminate the container.
+
+        :param string function_name: Name of the function we are running
+        :param integer timeout: Timeout in seconds
+        :param bsamcli.local.docker.container.Container container: Instance of a container to terminate
+        :param bool is_debugging: Are we debugging?
+        :return threading.Timer: Timer object, if we setup a timer. None otherwise
+        """
+
+        def timer_handler():
+            # NOTE: This handler runs in a separate thread. So don't try to mutate any non-thread-safe data structures
+            LOG.info("Function '%s' timed out after %d seconds", function_name, timeout)
+            process.terminate()
+
+        def signal_handler(sig, frame):
+            # NOTE: This handler runs in a separate thread. So don't try to mutate any non-thread-safe data structures
+            LOG.info("Execution of function %s was interrupted", function_name)
+            process.terminate()
+
+        if is_debugging or is_installing:
+            LOG.debug("Setting up SIGTERM interrupt handler")
+            signal.signal(signal.SIGTERM, signal_handler)
+        else:
+            # Start a timer, we'll use this to abort the function if it runs beyond the specified timeout
+            LOG.debug("Starting a timer for %s seconds for function '%s'", timeout, function_name)
+            timer = threading.Timer(timeout, timer_handler, ())
+            timer.start()
+            return timer
 
 
     @staticmethod

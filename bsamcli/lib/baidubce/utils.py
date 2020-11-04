@@ -459,7 +459,7 @@ def required(**types):
     return _required
 
 
-def parse_host_port(endpoint, default_protocol):
+def parse_host_port_path(endpoint, default_protocol):
     """
     parse protocol, host, port from endpoint in config
 
@@ -469,7 +469,7 @@ def parse_host_port(endpoint, default_protocol):
     :type: baidubce.protocol.HTTP or baidubce.protocol.HTTPS
     :param default_protocol: if there is no scheme in endpoint,
                               we will use this protocol as default
-    :return: tuple of protocol, host, port
+    :return: tuple of protocol, host, port, path
     """
     # netloc should begin with // according to RFC1808
     if b"//" not in endpoint:
@@ -496,7 +496,8 @@ def parse_host_port(endpoint, default_protocol):
     if parse_result.port is not None:
         port = parse_result.port
 
-    return protocol, host, port
+    path = parse_result.path.decode("utf-8")
+    return protocol, host, port, path
 
 
 """
