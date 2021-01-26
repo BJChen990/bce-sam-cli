@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 _TEMPLATE_OPTION_DEFAULT_VALUE = "template.yaml"
 
 
-def execute_pkg_command(command):
+def execute_pkg_command(command, with_src):
     LOG.debug("%s command is called", command)
     try:
         with DeployContext(template_file=_TEMPLATE_OPTION_DEFAULT_VALUE,
@@ -40,7 +40,7 @@ def execute_pkg_command(command):
                            log_file=None,
                            ) as context:
             for f in context.all_functions:
-                codeuri = warp_codeuri(f)
+                codeuri = warp_codeuri(f, with_src)
                 zip_up(codeuri, f.name)
     except FunctionNotFound:
         raise UserException("Function not found in template")
@@ -188,8 +188,9 @@ def zip_up(code_uri, zipfile_name):
             fpath = dirpath.replace(code_uri, '')  # 这一句很重要，不replace的话，就从根目录开始复制
             fpath = fpath and fpath + os.sep or ''
             for filename in filenames:
+                if filename == zipfile_name:  # 忽略 zip 文件自己
+                    continue
                 z.write(os.path.join(dirpath, filename), fpath + filename)
-
     LOG.info('%s zip suceeded!', zipfile_name)
     z.close()
 
@@ -210,9 +211,17 @@ def create_triggers(cfc_client, function, context):
         raise UserException(str(e))
 
 
-def warp_codeuri(f):
+def warp_codeuri(f, with_src):
     LOG.debug("f.runtime is: %s", f.runtime)
     if f.runtime == "dotnetcore2.2":
         new_uri = os.path.join(f.codeuri, "bin", "Release", "netcoreapp2.2", "publish/")
         return new_uri
+
+    # 正常情况下, codeuri 是 target/, 打包代码的话需要把上一层一起打包
+    if f.runtime == "java8" and with_src:
+        new_uri = os.path.join(f.codeuri, "..")
+        if not os.path.exists(os.path.join(new_uri, "src")):
+            raise UserException("Source code dir 'src' not found")
+        return new_uri
+
     return f.codeuri

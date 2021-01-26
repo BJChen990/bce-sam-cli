@@ -227,16 +227,18 @@ class CfcRuntimeNative(CfcRuntime):
         :raises Keyboard
         """
         environ = function_config.env_vars
+        timer = None
+        event_path = None
         if is_installing:
             environ.add_install_flag()
+        else:
+            event_path = _create_tmp_event_file(event)
         # Generate a dictionary of environment variable key:values
         env_vars = environ.resolve()
         env_vars["_FUNC_NAME"] = function_config.name
         entry = CfcRuntimeNative._get_entry_point(function_config.runtime, debug_context)
-        timer = None
 
         with self._get_code_dir(function_config, cwd, is_installing) as code_dir:
-            event_path = _create_tmp_event_file(event)
             env_vars["_FUNC_EVENT"] = event_path
             env_vars["_TIMEOUT"] = str(env_vars["_TIMEOUT"])
             try:
@@ -273,7 +275,8 @@ class CfcRuntimeNative(CfcRuntime):
             finally:
                 if timer:
                     timer.cancel()
-                os.unlink(event_path)
+                if event_path:
+                    os.unlink(event_path)
                 process.terminate()
 
     def _configure_interrupt(self, function_name, timeout, process, is_debugging, is_installing):
@@ -308,7 +311,6 @@ class CfcRuntimeNative(CfcRuntime):
             timer = threading.Timer(timeout, timer_handler, ())
             timer.start()
             return timer
-
 
     @staticmethod
     def _get_entry_point(runtime, debug_options=None):
